@@ -13,6 +13,8 @@ import com.sun.jdi.ThreadReference;
 import com.sun.jdi.VirtualMachine;
 
 import collect.runtime.information.condition.Condition;
+import collect.runtime.information.condition.ElementNumberCondition;
+import collect.runtime.information.condition.FieldValueCondition;
 import collect.runtime.information.condition.MethodExistCondition;
 import collect.runtime.information.condition.ObjectNumberCondition;
 import collect.runtime.information.hierarchy.JClass;
@@ -36,16 +38,21 @@ public class VMInfo {
     private HashSet<String> objClasses = new HashSet<String>();
     private HashMap<String, JClass> targetJClasses = new HashMap<String, JClass>();
     
+    //static fields
     /** for output conditions at stop points*/
-    private List<Condition> outputConditions = new ArrayList<Condition> ();
+    public static List<Condition> outputConditions = new ArrayList<Condition> ();
     /** for input conditions. point id and conditions*/
-    private HashMap<String, List<Condition>> inputConditions = new HashMap<String, List<Condition>>();
-
+    public static HashMap<String, List<Condition>> inputConditions = new HashMap<String, List<Condition>>();
     /** default is 1 */
-    private Level level = Level.ONE;
+    private static Level LEVEL = Level.ONE;
     /** default is 1. 0 is no limit. */
-    private int depth = 1;
-
+    private static int DEPTH = 1;
+    /** used for external classes while extracting conditions. Should be re-initialized at each stop point.*/
+    public static Level EXTERNAL_LEVEL = LEVEL;
+    /** used for external classes while extracting conditions. Should be re-initialized at each stop point.*/
+    public static int EXTERNAL_DEPTH = DEPTH;
+    ///////
+    
     public void addObjClass(String objClass) {
         this.objClasses.add(objClass);
     }
@@ -64,19 +71,21 @@ public class VMInfo {
 
     public void setLevelDeepth(int level, int deepth) {
         if (level == 1) {
-            this.level = Level.ONE;
-            this.depth = 1;
+            LEVEL = Level.ONE;
+            DEPTH = 1;
         } else if (level == 2) {
-            this.level = Level.TWO;
-            this.depth = deepth;
+            LEVEL = Level.TWO;
+            DEPTH = deepth;
         } else if (level == 3) {
-            this.level = Level.THREE;
-            this.depth = deepth;
+            LEVEL = Level.THREE;
+            DEPTH = deepth;
         }
     }
 
     public void clearInfo() {
-        this.outputConditions.clear();
+        EXTERNAL_LEVEL = LEVEL;
+        EXTERNAL_DEPTH = DEPTH;
+        outputConditions.clear();
         for (String objCla : this.objClasses)
             this.targetJClasses.put(objCla, null);
     }
@@ -85,35 +94,49 @@ public class VMInfo {
         this.targetJClasses.put(name, jclass);
     }
 
-    public void extractInfoFromVm(VirtualMachine vm, ThreadReference eventThread) {
+    public void createObjectsAndConditions(VirtualMachine vm, ThreadReference eventThread) {
         // get methods' name. level is one, two or three.
         try {
             for (StackFrame frame : eventThread.frames()) {
                 Method met = frame.location().method();
-                this.outputConditions.add(new MethodExistCondition(met));
+                outputConditions.add(new MethodExistCondition(met));
             }
         } catch (IncompatibleThreadStateException e) {
             e.printStackTrace();
         }
         // get instances of targeted classes, level is two or three
-        if (this.level == Level.TWO || this.level == Level.THREE)
+        if (LEVEL == Level.TWO || LEVEL == Level.THREE)
             for (String className : this.objClasses) {
                 List<ReferenceType> referTypes = vm.classesByName(className);
                 if (!referTypes.isEmpty()) {
                     ReferenceType oneType = referTypes.get(0);
-                    JClass jclass = new JClass(oneType, className, eventThread);
-                    this.outputConditions.add(new ObjectNumberCondition(jclass));
+                    // Conditions are created in JCreateVisitorImplement while creating objects
+                    //here, fieldname is null, using "".
+                    JClass jclass = new JClass(oneType, null, eventThread);
+                    outputConditions.add(new ObjectNumberCondition(jclass));
                     this.targetJClasses.put(className, jclass);
                 }
             }
     }
-    public void printInfo(){
-        
+    public void printConditions(){
+        for(Condition con: outputConditions){
+            if(con instanceof ElementNumberCondition){
+                printMessage(((ElementNumberCondition)con).toString());
+            } else if(con instanceof FieldValueCondition){
+                printMessage(((FieldValueCondition)con).toString());
+            } else if(con instanceof MethodExistCondition){
+                printMessage(((MethodExistCondition)con).toString());
+            } else if(con instanceof ObjectNumberCondition){
+                printMessage(((ObjectNumberCondition)con).toString());
+            } else{
+                printMessage("unrecoginzed condition");
+            }
+        }
     }
     
-    public void recordConditions(){
-        
-    }
+//    public void recordConditions(){
+//        
+//    }
     private void printMessage(String message) {
         System.out.println("[vm] message: " + message);
     }

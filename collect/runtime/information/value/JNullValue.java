@@ -1,5 +1,6 @@
 package collect.runtime.information.value;
 
+import com.sun.jdi.Field;
 import com.sun.jdi.Type;
 import com.sun.jdi.Value;
 
@@ -8,21 +9,23 @@ import collect.runtime.information.hierarchy.JField;
 public class JNullValue extends JValue {
     Type type;
 
-    public JNullValue(String name, JValue jvalue) {
-        this(null, name, jvalue);
-    }
+//    public JNullValue(String name, JValue jvalue) {
+//        this(null, name, jvalue);
+//    }
 
-    public JNullValue(Type type, String name, JValue jvalue) {
-        super(name);
+    public JNullValue(String name,Type type, Field field, JValue jvalue) {
+        super(name,field);
         this.type = type;
-        if (jvalue != null)
+        if (jvalue != null){
             this.fieldPath = jvalue.fieldPath.clone();
+            this.topLevelObjId = jvalue.topLevelObjId;
+        }
     }
 
     @Override
-    public void acceptPrint(JPrintVisitor visitor) {
+    public void acceptExtract(JExtractVisitor visitor) {
         // TODO Auto-generated method stub
-        visitor.print(this);
+        visitor.extract(this);
     }
 
     @Override
@@ -35,15 +38,14 @@ public class JNullValue extends JValue {
     protected void create() {
         JField jf = null;
         if (type == null)
-            jf = new JField(null, null, this.name, null);
+            jf = new JField(null, null, this.name, this.currentfield);
         else
-            jf = new JField(type, type.name(), name, null);
+            jf = new JField(type, type.name(), name, this.currentfield);
         this.fieldPath.addFieldToPath(jf);
-        return;
     }
 
     @Override
-    protected void print() {
+    protected void extract() {
         if (type != null)
             System.out.print(type.name() + " ");
         else
@@ -52,12 +54,16 @@ public class JNullValue extends JValue {
     }
 
     public void printNull() {
-        print();
+        extract();
     }
 
     @Override
     public Value getVmValue() {
         return null;
+    }
+    @Override
+    public String getRealValueAsString(){
+        return NULL;
     }
 
 }

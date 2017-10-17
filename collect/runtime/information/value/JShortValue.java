@@ -1,5 +1,6 @@
 package collect.runtime.information.value;
 
+import com.sun.jdi.Field;
 import com.sun.jdi.ShortValue;
 import com.sun.jdi.Value;
 
@@ -10,15 +11,17 @@ public class JShortValue extends JValue {
     boolean isWrapper = false;
     short real;
 
-    public JShortValue(ShortValue value, String name, JValue jvalue) {
-        super(name);
+    public JShortValue(String name,ShortValue value, Field field, JValue jvalue) {
+        super(name,field);
         this.shortv = value;
         this.real = value.shortValue();
         this.fieldPath = jvalue.fieldPath.clone();
+        
+        this.topLevelObjId = jvalue.topLevelObjId;
     }
 
     public JShortValue(short real) {
-        super(null);
+        super();
         this.shortv = null;
         this.real = real;
     }
@@ -27,20 +30,19 @@ public class JShortValue extends JValue {
         return this.real;
     }
 
-    protected void print() {
+    protected void extract() {
         System.out.println(shortv.type().name() + " " + name + " = " + shortv.shortValue());
     }
 
     @Override
-    public void acceptPrint(JPrintVisitor jpa) {
-        jpa.print(this);
+    public void acceptExtract(JExtractVisitor jpa) {
+        jpa.extract(this);
     }
 
     @Override
     protected void create() {
-        JField jf = new JField(this.shortv.type(), this.shortv.type().name(), this.name, null);
+        JField jf = new JField(this.shortv.type(), this.shortv.type().name(), this.name, this.currentfield);
         this.fieldPath.addFieldToPath(jf);
-        return;
     }
 
     @Override
@@ -51,5 +53,9 @@ public class JShortValue extends JValue {
     @Override
     public Value getVmValue() {
         return this.shortv;
+    }
+    @Override
+    public String getRealValueAsString(){
+        return String.valueOf(real);
     }
 }

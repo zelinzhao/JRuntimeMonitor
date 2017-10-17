@@ -57,12 +57,15 @@ enum Operator{
  *       >>,VALUE, package.class, the.field.path, the.field.type, 0/1/2.3/string/c/null/not_null...
  */
 public abstract class Condition {
-    protected ProgramPoint pointID;
-    protected String rawCond;
-    protected String className;
     protected Operator oper;
     
-    public String getOperString(){
+    /** For creating conditions from input*/
+    protected ProgramPoint pointID;
+    /** For creating conditions from input*/
+    protected String rawCond;
+    
+    @Override
+    public String toString(){
         switch (oper){
         case EXIST:         return "++"; 
         case NOT_EXIST:     return "--"; 

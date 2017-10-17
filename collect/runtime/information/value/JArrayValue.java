@@ -14,23 +14,30 @@ import com.sun.jdi.Type;
 import com.sun.jdi.Value;
 import com.sun.jdi.VoidValue;
 
+import collect.runtime.information.condition.ElementNumberCondition;
 import collect.runtime.information.hierarchy.JField;
 
 public class JArrayValue extends JValue {
     ArrayReference array;
     Type elementType;
+    
+    private ElementNumberCondition elementNumberCondition;
+    public void setElementNumberCondition(ElementNumberCondition enc){
+        this.elementNumberCondition = enc;
+    }
+    public ElementNumberCondition getElementNumberCondition(){
+        return this.elementNumberCondition;
+    }
 
     List<JValue> elements = new ArrayList<JValue>();
 
-    public JArrayValue(ArrayReference array, String name, ThreadReference eventthread, Field field){
-        super(name, eventthread, field);
-        this.array = array;
-    }
-
     public JArrayValue(ArrayReference array, String name, Field currentfield, JValue jvalue) {
-        this(array, name, jvalue.eventthread, currentfield);
+        super(name,jvalue.eventthread,currentfield);
+        this.array = array;
         this.alreadyObj = jvalue.alreadyObj;
         this.fieldPath = jvalue.fieldPath.clone();
+        
+        this.topLevelObjId = jvalue.topLevelObjId;
     }
 
     public Type getElementType() {
@@ -42,13 +49,12 @@ public class JArrayValue extends JValue {
     }
 
     @Override
-    protected void print() {
+    protected void extract() {
         System.out.println(array.type().name() + " " + name + ":");
         for (JValue jv : elements) {
-            jv.acceptPrint(printvisitor);
+            jv.acceptExtract(extractVisitor);
         }
     }
-
     protected void create() {
         try {
             if (alreadyObj.containsKey(this.array.uniqueID()))
@@ -57,23 +63,14 @@ public class JArrayValue extends JValue {
             alreadyObj.put(this.array.uniqueID(), this.array);
             ArrayType arraytype = (ArrayType) array.referenceType();
 
-            JField jf = new JField(arraytype, arraytype.name(), this.name, null);
+            JField jf = new JField(arraytype, arraytype.name(), this.name, this.currentfield);
             this.fieldPath.addFieldToPath(jf);
 
             this.elementType = arraytype.componentType();
             int index = 0;
             for (Value elementvalue : array.getValues()) {
                 String name = "[" + index + "]";
-                JValue jv = null;
-                if (elementvalue == null) // create null value
-                    jv = createReference(elementType, elementvalue, name, currentfield, this);
-                else if (elementvalue instanceof PrimitiveValue) {
-                    jv = createPrimitive(elementvalue, name, this);
-                } else if (elementvalue instanceof ObjectReference) {
-                    jv = createReference(elementvalue.type(), elementvalue, name, currentfield, this);
-                } else if (elementvalue instanceof VoidValue) {
-                    System.out.println("Object unsupported type " + elementType.name());
-                }
+                JValue jv = createFieldValue(currentfield, name, elementType, elementvalue, this);
                 this.elements.add(jv);
                 index++;
             }
@@ -84,8 +81,8 @@ public class JArrayValue extends JValue {
     }
 
     @Override
-    public void acceptPrint(JPrintVisitor jpa) {
-        jpa.print(this);
+    public void acceptExtract(JExtractVisitor jpa) {
+        jpa.extract(this);
     }
 
     public void acceptCreate(JCreateVisitor jcv) {
@@ -95,5 +92,9 @@ public class JArrayValue extends JValue {
     @Override
     public Value getVmValue() {
         return this.array;
+    }
+    @Override
+    public String getRealValueAsString(){
+        return NOT_NULL;
     }
 }

@@ -1,5 +1,6 @@
 package collect.runtime.information.value;
 
+import com.sun.jdi.Field;
 import com.sun.jdi.StringReference;
 import com.sun.jdi.Value;
 
@@ -10,15 +11,17 @@ public class JStringValue extends JValue {
     StringReference string;
     String real;
 
-    public JStringValue(StringReference string, String name, JValue jvalue) {
-        super(name);
+    public JStringValue(String name,StringReference string, Field field, JValue jvalue) {
+        super(name, field);
         this.string = string;
         this.real = string.value();
         this.fieldPath = jvalue.fieldPath.clone();
+        
+        this.topLevelObjId = jvalue.topLevelObjId;
     }
 
     public JStringValue(String real) {
-        super(null);
+        super();
         this.string = null;
         this.real = real;
     }
@@ -27,20 +30,19 @@ public class JStringValue extends JValue {
         return this.real;
     }
 
-    protected void print() {
+    protected void extract() {
         System.out.println(string.type().name() + " " + name + " = " + string.value());
     }
 
     @Override
-    public void acceptPrint(JPrintVisitor jpa) {
-        jpa.print(this);
+    public void acceptExtract(JExtractVisitor jpa) {
+        jpa.extract(this);
     }
 
     @Override
     protected void create() {
-        JField jf = new JField(this.string.type(), this.string.type().name(), this.name, null);
+        JField jf = new JField(this.string.type(), this.string.type().name(), this.name, this.currentfield);
         this.fieldPath.addFieldToPath(jf);
-        return;
     }
 
     @Override
@@ -51,5 +53,9 @@ public class JStringValue extends JValue {
     @Override
     public Value getVmValue() {
         return this.string;
+    }
+    @Override
+    public String getRealValueAsString(){
+        return this.real;
     }
 }

@@ -21,4 +21,13 @@ public class JField extends Base {
         String n = new String(name);
         return new JField(type, tn, n, field);
     }
+    
+    /**
+     * @return field name if this field is not null, or return ""
+     */
+    public String getFieldAsString(){
+        if(this.name == null || this.name.length()==0)
+            return THIS_OBJ;
+        return this.name;
+    }
 }

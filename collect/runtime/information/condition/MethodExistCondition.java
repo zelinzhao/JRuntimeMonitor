@@ -12,25 +12,23 @@ import com.sun.jdi.Method;
 public class MethodExistCondition extends Condition{
     private static final String type = "EXIST";
     private Method method;
-    private String methodName;
-    private String methodDesc;
     
+    /**
+     * for output creation. the operator is default.
+     * @param method
+     */
     public MethodExistCondition(Method method){
-        this.className = method.declaringType().name();
         this.method = method;
-        this.methodName = method.name();
-        this.methodDesc = method.signature();
         this.oper = Operator.EXIST;
     }
     
     @Override
     public String toString(){
-        String result = "";
-        result += this.getOperString()+",";
+        String result = super.toString()+",";
         result += type+",";
-        result += this.className+",";
-        result += this.methodName+",";
-        result += this.methodDesc;
+        result += this.method.declaringType().name()+",";
+        result += this.method.name()+",";
+        result += this.method.signature();
         return result;
     }
 }

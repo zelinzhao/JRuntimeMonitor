@@ -18,6 +18,7 @@ import com.sun.jdi.ThreadReference;
 import com.sun.jdi.Type;
 import com.sun.jdi.Value;
 
+import collect.runtime.information.condition.ElementNumberCondition;
 import collect.runtime.information.hierarchy.JField;
 
 public class JListValue extends JValue {
@@ -29,18 +30,29 @@ public class JListValue extends JValue {
     Type elementType;
     String genericSign;
     int size = 0;
-
+    
+    private ElementNumberCondition elementNumberCondition;
+    public void setElementNumberCondition(ElementNumberCondition enc){
+        this.elementNumberCondition = enc;
+    }
+    public ElementNumberCondition getElementNumberCondition(){
+        return this.elementNumberCondition;
+    }
     List<JValue> elements = new ArrayList<JValue>();
 
-    public JListValue(ObjectReference object, String name, ThreadReference eventthread, Field field) {
-        super(name, eventthread, field);
-        this.object = object;
-    }
+//    public JListValue(String name,ObjectReference object, ThreadReference eventthread, Field field) {
+//        super(name, eventthread, field);
+//        this.object = object;
+//    }
 
-    public JListValue(ObjectReference array, String name, Field currentfield, JValue jvalue) {
-        this(array, name, jvalue.eventthread, currentfield);
+    public JListValue(String name,ObjectReference array, Field currentfield, JValue jvalue) {
+//        this(name,array, jvalue.eventthread, currentfield);
+        super(name, jvalue.eventthread, currentfield);
+        this.object = array;
         this.alreadyObj = jvalue.alreadyObj;
         this.fieldPath = jvalue.fieldPath.clone();
+        
+        this.topLevelObjId = jvalue.topLevelObjId;
     }
 
     public Type getComponentType() {
@@ -48,11 +60,11 @@ public class JListValue extends JValue {
     }
 
     @Override
-    protected void print() {
+    protected void extract() {
         System.out.println(object.type().name() + " " + name + " (generic signature is " + genericSign + "):");
         int index = 0;
         for (JValue jv : elements) {
-            jv.acceptPrint(printvisitor);
+            jv.acceptExtract(extractVisitor);
         }
     }
 
@@ -78,7 +90,7 @@ public class JListValue extends JValue {
             // TODO recursive reference
             return;
         alreadyObj.put(this.object.uniqueID(), this.object);
-        JField jf = new JField(this.object.type(), this.object.type().name(), this.name, null);
+        JField jf = new JField(this.object.type(), this.object.type().name(), this.name, this.currentfield);
         this.fieldPath.addFieldToPath(jf);
         try {
             this.genericSign = this.currentfield.genericSignature();
@@ -109,15 +121,11 @@ public class JListValue extends JValue {
                         ObjectReference.INVOKE_SINGLE_THREADED);
                 JValue jv = null;
                 if (element == null) {
-                    jv = createReference(null, element, "[" + i + "]", currentfield, this);
+                    jv = createFieldValue(currentfield, "[" + i + "]", null, element, this);
                 } else {
                     if (this.elementType == null)
                         this.elementType = element.type();
-                    // no primitive in list
-                    // if (element instanceof PrimitiveValue)
-                    // jv = createPrimitive(element, "[" + i + "]", vmname);
-                    // else if (element instanceof ObjectReference)
-                    jv = createReference(element.type(), element, "[" + i + "]", currentfield, this);
+                    jv = createFieldValue(currentfield, "[" + i + "]", element.type(), element, this);
                 }
                 this.elements.add(jv);
             }
@@ -129,15 +137,15 @@ public class JListValue extends JValue {
     }
 
     @Override
-    public void acceptPrint(JPrintVisitor jpa) {
-        jpa.print(this);
+    public void acceptExtract(JExtractVisitor jpa) {
+        jpa.extract(this);
     }
 
     public void acceptCreate(JCreateVisitor jcv) {
         jcv.create(this);
     }
 
-    private int getSize() {
+    public int getSize() {
         return size;
     }
 
@@ -145,5 +153,8 @@ public class JListValue extends JValue {
     public Value getVmValue() {
         return this.object;
     }
-
+    @Override
+    public String getRealValueAsString(){
+        return NOT_NULL;
+    }
 }

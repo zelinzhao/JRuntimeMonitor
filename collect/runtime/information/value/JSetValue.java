@@ -19,6 +19,7 @@ import com.sun.jdi.ThreadReference;
 import com.sun.jdi.Type;
 import com.sun.jdi.Value;
 
+import collect.runtime.information.condition.ElementNumberCondition;
 import collect.runtime.information.hierarchy.JField;
 
 public class JSetValue extends JValue {
@@ -30,18 +31,22 @@ public class JSetValue extends JValue {
     Type elementType;
     String genericSign;
     int size = 0;
-
+    private ElementNumberCondition elementNumberCondition;
+    public void setElementNumberCondition(ElementNumberCondition enc){
+        this.elementNumberCondition = enc;
+    }
+    public ElementNumberCondition getElementNumberCondition(){
+        return this.elementNumberCondition;
+    }
     List<JValue> elements = new ArrayList<JValue>();
 
-    private JSetValue(ObjectReference object, String name, ThreadReference eventthread, Field field) {
-        super(name, eventthread, field);
-        this.object = object;
-    }
-
-    public JSetValue(ObjectReference array, String name, Field currentfield, JValue jvalue) {
-        this(array, name, jvalue.eventthread, currentfield);
+    public JSetValue(String name, ObjectReference array, Field currentfield, JValue jvalue) {
+        super(name, jvalue.eventthread, currentfield);
+        this.object = array;
         this.alreadyObj = jvalue.alreadyObj;
         this.fieldPath = jvalue.fieldPath.clone();
+        
+        this.topLevelObjId = jvalue.topLevelObjId;
     }
 
     public Type getComponentType() {
@@ -49,10 +54,10 @@ public class JSetValue extends JValue {
     }
 
     @Override
-    protected void print() {
+    protected void extract() {
         System.out.println(object.type().name() + " " + name + " (generic signature is " + genericSign + "):");
         for (JValue jv : elements) {
-            jv.acceptPrint(printvisitor);
+            jv.acceptExtract(extractVisitor);
         }
     }
 
@@ -83,7 +88,7 @@ public class JSetValue extends JValue {
             ClassType classtype = (ClassType) object.type();
             ReferenceType referencetype = object.referenceType();
 
-            JField jf = new JField(referencetype, referencetype.name(), this.name, null);
+            JField jf = new JField(referencetype, referencetype.name(), this.name, this.currentfield);
             this.fieldPath.addFieldToPath(jf);
 
             // get size of this set
@@ -105,8 +110,7 @@ public class JSetValue extends JValue {
             }
             ArrayReference allElement = (ArrayReference) object.invokeMethod(this.eventthread, toArrayMethod,
                     new ArrayList<Value>(), ObjectReference.INVOKE_SINGLE_THREADED);
-            JArrayValue arrayvalue = (JArrayValue) createReference(allElement.type(), allElement, name, currentfield,
-                    this);
+            JArrayValue arrayvalue = (JArrayValue) createFieldValue(currentfield, name, allElement.type(), allElement,this);
             this.elements = arrayvalue.elements;
             this.elementType = arrayvalue.elementType;
 
@@ -118,8 +122,8 @@ public class JSetValue extends JValue {
     }
 
     @Override
-    public void acceptPrint(JPrintVisitor jpa) {
-        jpa.print(this);
+    public void acceptExtract(JExtractVisitor jpa) {
+        jpa.extract(this);
     }
 
     public void acceptCreate(JCreateVisitor jcv) {
@@ -129,5 +133,12 @@ public class JSetValue extends JValue {
     @Override
     public Value getVmValue() {
         return this.object;
+    }
+    @Override
+    public String getRealValueAsString(){
+        return NOT_NULL;
+    }
+    public int getSize(){
+        return this.size;
     }
 }

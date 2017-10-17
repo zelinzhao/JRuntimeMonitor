@@ -22,6 +22,7 @@ import com.sun.jdi.ThreadReference;
 import com.sun.jdi.Type;
 import com.sun.jdi.Value;
 
+import collect.runtime.information.condition.ElementNumberCondition;
 import collect.runtime.information.hierarchy.JField;
 
 public class JMapValue extends JValue {
@@ -31,21 +32,30 @@ public class JMapValue extends JValue {
     Type valueType;
     String genericSign;
     int size;
-
+    private ElementNumberCondition elementNumberCondition;
+    public void setElementNumberCondition(ElementNumberCondition enc){
+        this.elementNumberCondition = enc;
+    }
+    public ElementNumberCondition getElementNumberCondition(){
+        return this.elementNumberCondition;
+    }
     List<JValue> keyElements = new ArrayList<JValue>();
     List<JValue> valueElements = new ArrayList<JValue>();
 
     HashMap<JValue, JValue> entryElements = new HashMap<JValue, JValue>();
 
-    public JMapValue(ObjectReference object, String name, ThreadReference eventthread, Field field) {
-        super(name, eventthread, field);
-        this.object = object;
-    }
+//    public JMapValue(ObjectReference object, ThreadReference eventthread, Field field) {
+//        super(field.name(), eventthread, field);
+//        this.object = object;
+//    }
 
-    public JMapValue(ObjectReference array, String name, Field currentfield, JValue jvalue) {
-        this(array, name, jvalue.eventthread, currentfield);
+    public JMapValue(String name,ObjectReference array, Field currentfield, JValue jvalue) {
+        super(name, jvalue.eventthread, currentfield);
+        this.object = array;
         this.alreadyObj = jvalue.alreadyObj;
         this.fieldPath = jvalue.fieldPath.clone();
+        
+        this.topLevelObjId = jvalue.topLevelObjId;
     }
 
     public Type getKeyType() {
@@ -57,15 +67,15 @@ public class JMapValue extends JValue {
     }
 
     @Override
-    protected void print() {
+    protected void extract() {
         System.out.println(object.type().name() + " " + name + " (generic signature is " + genericSign + "):");
         Iterator iter = entryElements.entrySet().iterator();
         while (iter.hasNext()) {
             Map.Entry<JValue, JValue> entry = (Entry<JValue, JValue>) iter.next();
             System.out.println("[key]:");
-            entry.getKey().acceptPrint(printvisitor);
+            entry.getKey().acceptExtract(extractVisitor);
             System.out.println("[value]:");
-            entry.getValue().acceptPrint(printvisitor);
+            entry.getValue().acceptExtract(extractVisitor);
         }
     }
 
@@ -92,7 +102,7 @@ public class JMapValue extends JValue {
             return;
         alreadyObj.put(this.object.uniqueID(), this.object);
 
-        JField jf = new JField(this.object.type(), this.object.type().name(), this.name, null);
+        JField jf = new JField(this.object.type(), this.object.type().name(), this.name, this.currentfield);
         this.fieldPath.addFieldToPath(jf);
         try {
             this.genericSign = this.currentfield.genericSignature();
@@ -128,8 +138,7 @@ public class JMapValue extends JValue {
             // get key set
             Value keySetValue = object.invokeMethod(eventthread, keySetMethod, new ArrayList(),
                     ObjectReference.INVOKE_SINGLE_THREADED);
-            JSetValue jKeySetValue = (JSetValue) createReference(keySetValue.type(), keySetValue, name, currentfield,
-                    this);
+            JSetValue jKeySetValue = (JSetValue) createFieldValue(currentfield, name, keySetValue.type(), keySetValue,this);
             this.keyElements = jKeySetValue.elements;
             for (JValue jOneKeyValue : this.keyElements) {
                 if (this.keyType == null)
@@ -140,10 +149,9 @@ public class JMapValue extends JValue {
                         ObjectReference.INVOKE_SINGLE_THREADED);
                 JValue jOneValueValue;
                 if (oneValueValue == null) {
-                    jOneValueValue = createReference(null, oneValueValue, jOneKeyValue.name, currentfield, this);
+                    jOneValueValue = createFieldValue(currentfield, jOneKeyValue.name, null, oneValueValue,this);
                 } else {
-                    jOneValueValue = createReference(oneValueValue.type(), oneValueValue, jOneKeyValue.name,
-                            currentfield, this);
+                    jOneValueValue = createFieldValue(currentfield, jOneKeyValue.name, oneValueValue.type(), oneValueValue, this);
                     if (this.valueType == null)
                         this.valueType = jOneValueValue.getVmValue().type();
                 }
@@ -159,8 +167,8 @@ public class JMapValue extends JValue {
     }
 
     @Override
-    public void acceptPrint(JPrintVisitor jpa) {
-        jpa.print(this);
+    public void acceptExtract(JExtractVisitor jpa) {
+        jpa.extract(this);
     }
 
     public void acceptCreate(JCreateVisitor jcv) {
@@ -170,5 +178,12 @@ public class JMapValue extends JValue {
     @Override
     public Value getVmValue() {
         return this.object;
+    }
+    @Override
+    public String getRealValueAsString(){
+        return NOT_NULL;
+    }
+    public int getSize(){
+        return this.size;
     }
 }

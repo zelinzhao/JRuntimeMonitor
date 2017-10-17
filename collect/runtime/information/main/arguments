@@ -1,2 +1,2 @@
--objclass demo.app.PhD,demo.app.Student,demo.app.Teacher -vmcp E:\Eclipse\CollectRuntimeInformation\bin \
--main demo.app.Main -stopat demo.app.PhD-print-()V:enter,demo.app.PhD-print-()V:exit,demo.app.Student:25 -level 3 -deepth 0
+-objclass demo.app.Main,demo.app.PhD,demo.app.Student,demo.app.Teacher -vmcp E:\Eclipse\CollectRuntimeInformation\bin \
+-main demo.app.Main -stopat demo.app.PhD-print-()V:enter,demo.app.PhD-print-()V:exit,demo.app.Student:25 -level 3 -depth 10

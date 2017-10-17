@@ -1,8 +1,8 @@
 package collect.runtime.information.value;
 
-public interface JPrintAccept {
+public interface JExtractAccept {
     /**
      * do not use this from externally
      */
-    void acceptPrint(JPrintVisitor visitor);
+    void acceptExtract(JExtractVisitor visitor);
 }

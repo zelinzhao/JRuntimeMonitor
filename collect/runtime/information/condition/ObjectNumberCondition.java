@@ -4,20 +4,24 @@ import collect.runtime.information.hierarchy.JClass;
 
 public class ObjectNumberCondition extends Condition{
     private static final String type = "OBJECT";
+    private JClass jclass;
     private int number;
     
+    /**
+     * for output creation. operator is default.
+     * @param jclass
+     */
     public ObjectNumberCondition(JClass jclass){
-        this.className = jclass.getTypeName();
+        this.jclass = jclass;
         this.number = jclass.getInstanceNumber();
         this.oper = Operator.EQUAL;
     }
     
     @Override 
     public String toString(){
-        String result = "";
-        result += this.getOperString()+",";
+        String result = super.toString()+",";
         result += type+",";
-        result += this.className+",";
+        result += this.jclass.getTypeName()+",";
         result += this.number;
         return result;
     }

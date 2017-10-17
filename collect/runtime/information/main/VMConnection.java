@@ -193,8 +193,8 @@ public class VMConnection extends VM {
             printMessage("stop in " + locCla + "." + locMetName+"-"+locMetDesc + " at line " + breakevent.location().lineNumber());
             
             this.eventthread = breakevent.thread();
-            this.info.extractInfoFromVm(vm, eventthread);
-            this.info.printInfo();
+            this.info.createObjectsAndConditions(vm, eventthread);
+            this.info.printConditions();
             
             //print all targeted objects here
         } else if ((event instanceof VMDisconnectEvent) || (event instanceof VMDeathEvent)) {

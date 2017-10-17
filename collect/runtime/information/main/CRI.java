@@ -47,7 +47,7 @@ public class CRI {
                 + " -level \n"
                 + "         1 (record methods' name at stop point. depth is 1.)\n"
                 + "         2 (includes 1; record primitive-type fields' value,\n"
-                + "             record null/not-null for reference-type fields,"
+                + "             record null/not-null for reference-type fields,\n"
                 + "             record size or length for list, map, set or array.\n"
                 + "         3 (includes 1; record primitive-type fields' value,\n"
                 + "             iterate into reference-type fields, record primitive-type fields' value,"

@@ -1,6 +1,8 @@
 package collect.runtime.information.hierarchy;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import com.sun.jdi.ClassNotLoadedException;
 import com.sun.jdi.Field;
@@ -9,6 +11,8 @@ import com.sun.jdi.ReferenceType;
 import com.sun.jdi.ThreadReference;
 import com.sun.jdi.Type;
 
+import collect.runtime.information.condition.Condition;
+import collect.runtime.information.main.VMInfo;
 import collect.runtime.information.value.JObjectValue;
 
 public class JClass extends Base {
@@ -22,7 +26,7 @@ public class JClass extends Base {
     private HashMap<String, JMethod> constructors = new HashMap<String, JMethod>();
 
     /** object name and ObjectReference, may not be needed */
-    private HashMap<String, JObjectValue> instances = new HashMap<String, JObjectValue>();
+    private HashMap<Long, JObjectValue> instances = new HashMap<Long, JObjectValue>();
 
     public JClass(Type type, String typename, String name) {
         super(type, typename, name);
@@ -39,8 +43,14 @@ public class JClass extends Base {
         this(type, type.name(), name);
     }
 
-    public JClass(ReferenceType type, String name, ThreadReference eventThread) {
-        this(type, type.name(), name);
+    /**
+     * 
+     * @param type
+     * @param fieldName, while creating a new object from scratch, there isn't fieldName, should use "" or null.
+     * @param eventThread
+     */
+    public JClass(ReferenceType type, String fieldName, ThreadReference eventThread) {
+        this(type, type.name(), fieldName);
         // get all fields of this class
         try {
             for (Field field : type.visibleFields())
@@ -50,16 +60,16 @@ public class JClass extends Base {
         }
         // get all instances of this class
         for (ObjectReference objRefer : type.instances(0)) {
-            String id = String.valueOf(objRefer.uniqueID());
-            JObjectValue jov = new JObjectValue(objRefer, name, eventThread, null);
+            JObjectValue jov = new JObjectValue(objRefer, fieldName, eventThread, null);
             jov.createObject();
-            this.instances.put(id, jov);
+            this.instances.put(objRefer.uniqueID(), jov);
         }
     }
 
-    public void printAllInstances() {
-        for (JObjectValue jov : this.instances.values())
-            jov.printObject();
+    public void extractObjsConditions() {
+        for (JObjectValue jov : this.instances.values()){
+            jov.extractConditions();
+        }
     }
     public int getInstanceNumber(){
         return this.instances.size();

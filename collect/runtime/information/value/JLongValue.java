@@ -1,5 +1,6 @@
 package collect.runtime.information.value;
 
+import com.sun.jdi.Field;
 import com.sun.jdi.LongValue;
 import com.sun.jdi.Value;
 
@@ -10,15 +11,17 @@ public class JLongValue extends JValue {
     boolean isWrapper = false;
     long real;
 
-    public JLongValue(LongValue value, String name, JValue jvalue) {
-        super(name);
+    public JLongValue(String name,LongValue value, Field field, JValue jvalue) {
+        super(name,field);
         this.longv = value;
         this.real = value.longValue();
         this.fieldPath = jvalue.fieldPath.clone();
+        
+        this.topLevelObjId = jvalue.topLevelObjId;
     }
 
     public JLongValue(long real) {
-        super(null);
+        super();
         this.longv = null;
         this.real = real;
     }
@@ -27,20 +30,20 @@ public class JLongValue extends JValue {
         return this.real;
     }
 
-    protected void print() {
+    @Override
+    protected void extract() {
         System.out.println(longv.type().name() + " " + name + " = " + longv.longValue());
     }
 
     @Override
-    public void acceptPrint(JPrintVisitor jpa) {
-        jpa.print(this);
+    public void acceptExtract(JExtractVisitor jpa) {
+        jpa.extract(this);
     }
 
     @Override
     protected void create() {
-        JField jf = new JField(this.longv.type(), this.longv.type().name(), this.name, null);
+        JField jf = new JField(this.longv.type(), this.longv.type().name(), this.name, this.currentfield);
         this.fieldPath.addFieldToPath(jf);
-        return;
     }
 
     @Override
@@ -51,5 +54,9 @@ public class JLongValue extends JValue {
     @Override
     public Value getVmValue() {
         return this.longv;
+    }
+    @Override
+    public String getRealValueAsString(){
+        return String.valueOf(real);
     }
 }

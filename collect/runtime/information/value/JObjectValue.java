@@ -2,6 +2,7 @@ package collect.runtime.information.value;
 
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -15,22 +16,42 @@ import com.sun.jdi.Type;
 import com.sun.jdi.Value;
 import com.sun.jdi.VoidValue;
 
+import collect.runtime.information.condition.Condition;
+import collect.runtime.information.condition.FieldValueCondition;
 import collect.runtime.information.hierarchy.JField;
+import collect.runtime.information.main.VMInfo;
 
 public class JObjectValue extends JValue {
     private ObjectReference object;
+    private ReferenceType type;
     private HashMap<String, JValue> fieldValues = new HashMap<String, JValue>();
     private HashMap<String, JValue> staticFieldValues = new HashMap<String, JValue>();
 
+    /**
+     * Be careful with this constructor.
+     * 
+     * @param value
+     * @param name
+     * @param eventthread
+     * @param field
+     *            field is null if this object is a top object
+     */
     public JObjectValue(ObjectReference value, String name, ThreadReference eventthread, Field field) {
         super(name, eventthread, field);
         this.object = value;
+        this.type = object.referenceType();
+
+        if (field == null) {
+            this.topLevelObjId = value.uniqueID();
+        }
     }
 
-    public JObjectValue(ObjectReference object, String name, Field currentfield, JValue jvalue) {
+    public JObjectValue(String name, ObjectReference object, Field currentfield, JValue jvalue) {
         this(object, name, jvalue.eventthread, currentfield);
         this.alreadyObj = jvalue.alreadyObj;
         this.fieldPath = jvalue.fieldPath.clone();
+
+        this.topLevelObjId = jvalue.topLevelObjId;
     }
 
     public void setFields(HashMap<String, JValue> fieldValues) {
@@ -50,14 +71,14 @@ public class JObjectValue extends JValue {
     }
 
     @Override
-    protected void print() {
+    protected void extract() {
         System.out.println(this.object.type().name() + " " + this.name + ":");
         Iterator iter = fieldValues.entrySet().iterator();
         while (iter.hasNext()) {
             Map.Entry<String, JValue> entry = (Entry<String, JValue>) iter.next();
             // System.out.println("[name] "+ entry.getKey() + " [type] "+
             // entry.getValue().value.type().name());
-            entry.getValue().acceptPrint(printvisitor);
+            entry.getValue().acceptExtract(extractVisitor);
         }
         if (this.staticFieldValues.size() > 0)
             System.out.println("[static]");
@@ -66,18 +87,23 @@ public class JObjectValue extends JValue {
             Map.Entry<String, JValue> entry = (Entry<String, JValue>) iter.next();
             // System.out.println("[name] "+ entry.getKey() + " [type] "+
             // entry.getValue().value.type().name());
-            entry.getValue().acceptPrint(printvisitor);
+            entry.getValue().acceptExtract(extractVisitor);
         }
     }
 
     @Override
-    public void acceptPrint(JPrintVisitor jpa) {
-        jpa.print(this);
+    public void acceptExtract(JExtractVisitor jpa) {
+        jpa.extract(this);
     }
 
     @Override
     public void acceptCreate(JCreateVisitor visitor) {
         visitor.create(this);
+    }
+
+    @Override
+    public String getRealValueAsString() {
+        return NOT_NULL;
     }
 
     protected void create() {
@@ -87,48 +113,32 @@ public class JObjectValue extends JValue {
             return;
         }
 
-        ObjectReference objectReference = (ObjectReference) this.object;
-        ReferenceType referencetype = objectReference.referenceType();
-        JField f = new JField(referencetype, referencetype.name(), this.name, null);
+        JField f = new JField(this.type, this.type.name(), this.name, this.currentfield);
         this.fieldPath.addFieldToPath(f);
 
         // recurrence reference occured
-        if (alreadyObj.containsKey(objectReference.uniqueID())) {
+        if (this.alreadyObj.containsKey(this.object.uniqueID())) {
             System.out.println(name + this.object.type().name() + "recurrence reference to "
-                    + alreadyObj.get(objectReference.uniqueID()));
+                    + this.alreadyObj.get(this.object.uniqueID()));
             // TODO recurrence reference is not perfect. especially print and
             // compare
             return;
         }
-        alreadyObj.put(this.object.uniqueID(), this.object);
-        this.alreadyObj.put(objectReference.uniqueID(), objectReference);
+        this.alreadyObj.put(this.object.uniqueID(), this.object);
+
         try {
-            for (Field loopfield : referencetype.visibleFields()) {
+            for (Field loopfield : this.type.visibleFields()) {
                 if (loopfield.isSynthetic())
                     continue;
                 String fieldname = loopfield.name();
-                Value fieldvalue = objectReference.getValue(loopfield);
+                Value fieldvalue = this.object.getValue(loopfield);
                 Type fieldtype = loopfield.type();
-                if (fieldtype instanceof PrimitiveType) {
-                    JValue jv = createPrimitive(fieldvalue, fieldname, this);
-                    if (loopfield.isStatic())
-                        this.staticFieldValues.put(fieldname, jv);
-                    else
-                        this.fieldValues.put(fieldname, jv);
-                } else if (fieldtype instanceof ReferenceType) {
-                    JValue jv = createReference(fieldtype, fieldvalue, fieldname, loopfield, this);
-                    if (loopfield.isStatic())
-                        this.staticFieldValues.put(fieldname, jv);
-                    else
-                        this.fieldValues.put(fieldname, jv);
-                    // alreadyObj.put(objectReference.uniqueID(),
-                    // objectReference);
-                    // if (objectReference instanceof StringReference) {
-                    // alreadyObj.remove(objectReference.uniqueID());
-                    // }
-                } else if (fieldtype instanceof VoidValue) {
-                    System.out.println(fieldname + " type is void");
-                }
+                JValue jv = createFieldValue(loopfield, fieldname, fieldtype, fieldvalue, this);
+                if (loopfield.isStatic())
+                    this.staticFieldValues.put(fieldname, jv);
+                else
+                    this.fieldValues.put(fieldname, jv);
+
             }
         } catch (ClassNotLoadedException e) {
             // TODO Auto-generated catch block
@@ -137,11 +147,11 @@ public class JObjectValue extends JValue {
     }
 
     public void createObject() {
-        this.acceptCreate(createvisitor);
+        this.acceptCreate(createVisitor);
     }
 
-    public void printObject() {
-        this.acceptPrint(printvisitor);
+    public void extractConditions() {
+        this.acceptExtract(extractVisitor);
     }
 
     @Override

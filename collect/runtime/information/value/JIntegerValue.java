@@ -1,25 +1,31 @@
 package collect.runtime.information.value;
 
+import com.sun.jdi.Field;
 import com.sun.jdi.IntegerValue;
 import com.sun.jdi.Value;
 
+import collect.runtime.information.condition.Condition;
+import collect.runtime.information.condition.FieldValueCondition;
 import collect.runtime.information.hierarchy.JField;
+import collect.runtime.information.main.VMInfo;
 
 public class JIntegerValue extends JValue {
     // int integer;
     IntegerValue integer;
     boolean isWrapper = false;
     int real;
-
-    public JIntegerValue(IntegerValue value, String name, JValue jvalue) {
-        super(name);
+    
+    public JIntegerValue(String name, IntegerValue value, Field field, JValue jvalue) {
+        super(name,field);
         this.integer = value;
         this.real = value.intValue();
         this.fieldPath = jvalue.fieldPath.clone();
+        
+        this.topLevelObjId = jvalue.topLevelObjId;
     }
 
     public JIntegerValue(int real) {
-        super(null);
+        super();
         this.integer = null;
         this.real = real;
     }
@@ -28,20 +34,21 @@ public class JIntegerValue extends JValue {
         return this.real;
     }
 
-    protected void print() {
+    @Override
+    protected void extract() {
+        
         System.out.println(integer.type().name() + " " + name + " = " + integer.intValue());
     }
 
     @Override
-    public void acceptPrint(JPrintVisitor jpa) {
-        jpa.print(this);
+    public void acceptExtract(JExtractVisitor jpa) {
+        jpa.extract(this);
     }
 
     @Override
     protected void create() {
-        JField jf = new JField(this.integer.type(), this.integer.type().name(), this.name, null);
+        JField jf = new JField(this.integer.type(), this.integer.type().name(), this.name, this.currentfield);
         this.fieldPath.addFieldToPath(jf);
-        return;
     }
 
     @Override
@@ -52,5 +59,9 @@ public class JIntegerValue extends JValue {
     @Override
     public Value getVmValue() {
         return this.integer;
+    }
+    @Override
+    public String getRealValueAsString(){
+        return String.valueOf(real);
     }
 }
