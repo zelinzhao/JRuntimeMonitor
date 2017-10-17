@@ -34,16 +34,16 @@ public class JIntegerValue extends JValue {
         return this.real;
     }
 
-    @Override
-    protected void extract() {
-        
-        System.out.println(integer.type().name() + " " + name + " = " + integer.intValue());
-    }
-
-    @Override
-    public void acceptExtract(JExtractVisitor jpa) {
-        jpa.extract(this);
-    }
+//    @Override
+//    protected void extract() {
+//        
+//        System.out.println(integer.type().name() + " " + name + " = " + integer.intValue());
+//    }
+//
+//    @Override
+//    public void acceptExtract(JExtractVisitor jpa) {
+//        jpa.extract(this);
+//    }
 
     @Override
     protected void create() {

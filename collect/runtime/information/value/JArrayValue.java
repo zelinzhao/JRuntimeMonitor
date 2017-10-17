@@ -48,13 +48,14 @@ public class JArrayValue extends JValue {
         return array.length();
     }
 
+//    @Override
+//    protected void extract() {
+//        System.out.println(array.type().name() + " " + name + ":");
+//        for (JValue jv : elements) {
+//            jv.acceptExtract(extractVisitor);
+//        }
+//    }
     @Override
-    protected void extract() {
-        System.out.println(array.type().name() + " " + name + ":");
-        for (JValue jv : elements) {
-            jv.acceptExtract(extractVisitor);
-        }
-    }
     protected void create() {
         try {
             if (alreadyObj.containsKey(this.array.uniqueID()))
@@ -80,10 +81,10 @@ public class JArrayValue extends JValue {
         }
     }
 
-    @Override
-    public void acceptExtract(JExtractVisitor jpa) {
-        jpa.extract(this);
-    }
+//    @Override
+//    public void acceptExtract(JExtractVisitor jpa) {
+//        jpa.extract(this);
+//    }
 
     public void acceptCreate(JCreateVisitor jcv) {
         jcv.create(this);

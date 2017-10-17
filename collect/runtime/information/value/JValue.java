@@ -31,12 +31,12 @@ import com.sun.jdi.Value;
 import collect.runtime.information.condition.Condition;
 import collect.runtime.information.hierarchy.JFieldPath;
 
-public abstract class JValue implements JExtractAccept, JCreateAccept {
+public abstract class JValue implements JCreateAccept{ // JExtractAccept 
     //TODO: there are some container classes needed to be implemented
     protected static final String NOT_NULL = "NOT_NULL";
     protected static final String NULL = "NULL";
     
-    protected static JExtractVisitor extractVisitor = new JExtractVisitorImplement();
+//    protected static JExtractVisitor extractVisitor = new JExtractVisitorImplement();
     protected static JCreateVisitor createVisitor = new JCreateVisitorImplement();
     HashMap<Long, ObjectReference> alreadyObj = new HashMap<Long, ObjectReference>();
     protected long topLevelObjId;
@@ -102,10 +102,10 @@ public abstract class JValue implements JExtractAccept, JCreateAccept {
     public long getTopLevelObjId(){
         return this.topLevelObjId;
     }
-    /**
-     * do not use this from externally
-     */
-    protected abstract void extract();
+//    /**
+//     * do not use this from externally
+//     */
+//    protected abstract void extract();
 
     /**
      * do not use this from externally

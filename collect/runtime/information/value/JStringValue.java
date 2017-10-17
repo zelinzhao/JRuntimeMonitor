@@ -30,14 +30,14 @@ public class JStringValue extends JValue {
         return this.real;
     }
 
-    protected void extract() {
-        System.out.println(string.type().name() + " " + name + " = " + string.value());
-    }
+//    protected void extract() {
+//        System.out.println(string.type().name() + " " + name + " = " + string.value());
+//    }
 
-    @Override
-    public void acceptExtract(JExtractVisitor jpa) {
-        jpa.extract(this);
-    }
+//    @Override
+//    public void acceptExtract(JExtractVisitor jpa) {
+//        jpa.extract(this);
+//    }
 
     @Override
     protected void create() {

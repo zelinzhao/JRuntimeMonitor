@@ -31,15 +31,15 @@ public class JDoubleValue extends JValue {
         return this.real;
     }
 
-    @Override
-    protected void extract() {
-        System.out.println(this.doublev.type().name() + " " + name + " = " + this.doublev.doubleValue());
-    }
-
-    @Override
-    public void acceptExtract(JExtractVisitor jpa) {
-        jpa.extract(this);
-    }
+//    @Override
+//    protected void extract() {
+//        System.out.println(this.doublev.type().name() + " " + name + " = " + this.doublev.doubleValue());
+//    }
+//
+//    @Override
+//    public void acceptExtract(JExtractVisitor jpa) {
+//        jpa.extract(this);
+//    }
 
     @Override
     protected void create() {

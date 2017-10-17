@@ -22,11 +22,11 @@ public class JNullValue extends JValue {
         }
     }
 
-    @Override
-    public void acceptExtract(JExtractVisitor visitor) {
-        // TODO Auto-generated method stub
-        visitor.extract(this);
-    }
+//    @Override
+//    public void acceptExtract(JExtractVisitor visitor) {
+//        // TODO Auto-generated method stub
+//        visitor.extract(this);
+//    }
 
     @Override
     public void acceptCreate(JCreateVisitor visitor) {
@@ -44,18 +44,18 @@ public class JNullValue extends JValue {
         this.fieldPath.addFieldToPath(jf);
     }
 
-    @Override
-    protected void extract() {
-        if (type != null)
-            System.out.print(type.name() + " ");
-        else
-            System.out.print("type is null ");
-        System.out.println(this.name + " value is null");
-    }
+//    @Override
+//    protected void extract() {
+//        if (type != null)
+//            System.out.print(type.name() + " ");
+//        else
+//            System.out.print("type is null ");
+//        System.out.println(this.name + " value is null");
+//    }
 
-    public void printNull() {
-        extract();
-    }
+//    public void printNull() {
+//        extract();
+//    }
 
     @Override
     public Value getVmValue() {

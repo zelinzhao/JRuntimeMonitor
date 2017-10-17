@@ -70,31 +70,31 @@ public class JObjectValue extends JValue {
         return this.fieldValues.get(name);
     }
 
-    @Override
-    protected void extract() {
-        System.out.println(this.object.type().name() + " " + this.name + ":");
-        Iterator iter = fieldValues.entrySet().iterator();
-        while (iter.hasNext()) {
-            Map.Entry<String, JValue> entry = (Entry<String, JValue>) iter.next();
-            // System.out.println("[name] "+ entry.getKey() + " [type] "+
-            // entry.getValue().value.type().name());
-            entry.getValue().acceptExtract(extractVisitor);
-        }
-        if (this.staticFieldValues.size() > 0)
-            System.out.println("[static]");
-        iter = staticFieldValues.entrySet().iterator();
-        while (iter.hasNext()) {
-            Map.Entry<String, JValue> entry = (Entry<String, JValue>) iter.next();
-            // System.out.println("[name] "+ entry.getKey() + " [type] "+
-            // entry.getValue().value.type().name());
-            entry.getValue().acceptExtract(extractVisitor);
-        }
-    }
+//    @Override
+//    protected void extract() {
+//        System.out.println(this.object.type().name() + " " + this.name + ":");
+//        Iterator iter = fieldValues.entrySet().iterator();
+//        while (iter.hasNext()) {
+//            Map.Entry<String, JValue> entry = (Entry<String, JValue>) iter.next();
+//            // System.out.println("[name] "+ entry.getKey() + " [type] "+
+//            // entry.getValue().value.type().name());
+//            entry.getValue().acceptExtract(extractVisitor);
+//        }
+//        if (this.staticFieldValues.size() > 0)
+//            System.out.println("[static]");
+//        iter = staticFieldValues.entrySet().iterator();
+//        while (iter.hasNext()) {
+//            Map.Entry<String, JValue> entry = (Entry<String, JValue>) iter.next();
+//            // System.out.println("[name] "+ entry.getKey() + " [type] "+
+//            // entry.getValue().value.type().name());
+//            entry.getValue().acceptExtract(extractVisitor);
+//        }
+//    }
 
-    @Override
-    public void acceptExtract(JExtractVisitor jpa) {
-        jpa.extract(this);
-    }
+//    @Override
+//    public void acceptExtract(JExtractVisitor jpa) {
+//        jpa.extract(this);
+//    }
 
     @Override
     public void acceptCreate(JCreateVisitor visitor) {
@@ -150,9 +150,9 @@ public class JObjectValue extends JValue {
         this.acceptCreate(createVisitor);
     }
 
-    public void extractConditions() {
-        this.acceptExtract(extractVisitor);
-    }
+//    public void extractConditions() {
+//        this.acceptExtract(extractVisitor);
+//    }
 
     @Override
     public Value getVmValue() {

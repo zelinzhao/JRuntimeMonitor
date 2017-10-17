@@ -31,15 +31,15 @@ public class JCharValue extends JValue {
         return this.real;
     }
 
-    @Override
-    protected void extract() {
-        System.out.println(this.charv.type().name() + " " + name + " = " + this.charv.charValue());
-    }
-
-    @Override
-    public void acceptExtract(JExtractVisitor jpa) {
-        jpa.extract(this);
-    }
+//    @Override
+//    protected void extract() {
+//        System.out.println(this.charv.type().name() + " " + name + " = " + this.charv.charValue());
+//    }
+//
+//    @Override
+//    public void acceptExtract(JExtractVisitor jpa) {
+//        jpa.extract(this);
+//    }
 
     @Override
     protected void create() {

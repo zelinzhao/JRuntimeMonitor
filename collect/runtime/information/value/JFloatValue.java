@@ -31,15 +31,15 @@ public class JFloatValue extends JValue {
         return this.real;
     }
 
-    @Override
-    protected void extract() {
-        System.out.println(this.floatv.type().name() + " " + name + " = " + this.floatv.floatValue());
-    }
-
-    @Override
-    public void acceptExtract(JExtractVisitor jpa) {
-        jpa.extract(this);
-    }
+//    @Override
+//    protected void extract() {
+//        System.out.println(this.floatv.type().name() + " " + name + " = " + this.floatv.floatValue());
+//    }
+//
+//    @Override
+//    public void acceptExtract(JExtractVisitor jpa) {
+//        jpa.extract(this);
+//    }
 
     @Override
     protected void create() {

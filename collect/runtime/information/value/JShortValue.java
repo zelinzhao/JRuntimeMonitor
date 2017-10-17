@@ -30,14 +30,15 @@ public class JShortValue extends JValue {
         return this.real;
     }
 
-    protected void extract() {
-        System.out.println(shortv.type().name() + " " + name + " = " + shortv.shortValue());
-    }
+//    @Override
+//    protected void extract() {
+//        System.out.println(shortv.type().name() + " " + name + " = " + shortv.shortValue());
+//    }
 
-    @Override
-    public void acceptExtract(JExtractVisitor jpa) {
-        jpa.extract(this);
-    }
+//    @Override
+//    public void acceptExtract(JExtractVisitor jpa) {
+//        jpa.extract(this);
+//    }
 
     @Override
     protected void create() {

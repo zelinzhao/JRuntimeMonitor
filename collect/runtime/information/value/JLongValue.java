@@ -30,15 +30,15 @@ public class JLongValue extends JValue {
         return this.real;
     }
 
-    @Override
-    protected void extract() {
-        System.out.println(longv.type().name() + " " + name + " = " + longv.longValue());
-    }
-
-    @Override
-    public void acceptExtract(JExtractVisitor jpa) {
-        jpa.extract(this);
-    }
+//    @Override
+//    protected void extract() {
+//        System.out.println(longv.type().name() + " " + name + " = " + longv.longValue());
+//    }
+//
+//    @Override
+//    public void acceptExtract(JExtractVisitor jpa) {
+//        jpa.extract(this);
+//    }
 
     @Override
     protected void create() {

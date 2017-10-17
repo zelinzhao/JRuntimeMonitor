@@ -59,14 +59,14 @@ public class JListValue extends JValue {
         return this.elementType;
     }
 
-    @Override
-    protected void extract() {
-        System.out.println(object.type().name() + " " + name + " (generic signature is " + genericSign + "):");
-        int index = 0;
-        for (JValue jv : elements) {
-            jv.acceptExtract(extractVisitor);
-        }
-    }
+//    @Override
+//    protected void extract() {
+//        System.out.println(object.type().name() + " " + name + " (generic signature is " + genericSign + "):");
+//        int index = 0;
+//        for (JValue jv : elements) {
+//            jv.acceptExtract(extractVisitor);
+//        }
+//    }
 
     public static boolean isListValue(Type type) {
         List<InterfaceType> allinterface = null;
@@ -136,10 +136,10 @@ public class JListValue extends JValue {
         }
     }
 
-    @Override
-    public void acceptExtract(JExtractVisitor jpa) {
-        jpa.extract(this);
-    }
+//    @Override
+//    public void acceptExtract(JExtractVisitor jpa) {
+//        jpa.extract(this);
+//    }
 
     public void acceptCreate(JCreateVisitor jcv) {
         jcv.create(this);

@@ -66,18 +66,18 @@ public class JMapValue extends JValue {
         return this.valueType;
     }
 
-    @Override
-    protected void extract() {
-        System.out.println(object.type().name() + " " + name + " (generic signature is " + genericSign + "):");
-        Iterator iter = entryElements.entrySet().iterator();
-        while (iter.hasNext()) {
-            Map.Entry<JValue, JValue> entry = (Entry<JValue, JValue>) iter.next();
-            System.out.println("[key]:");
-            entry.getKey().acceptExtract(extractVisitor);
-            System.out.println("[value]:");
-            entry.getValue().acceptExtract(extractVisitor);
-        }
-    }
+//    @Override
+//    protected void extract() {
+//        System.out.println(object.type().name() + " " + name + " (generic signature is " + genericSign + "):");
+//        Iterator iter = entryElements.entrySet().iterator();
+//        while (iter.hasNext()) {
+//            Map.Entry<JValue, JValue> entry = (Entry<JValue, JValue>) iter.next();
+//            System.out.println("[key]:");
+//            entry.getKey().acceptExtract(extractVisitor);
+//            System.out.println("[value]:");
+//            entry.getValue().acceptExtract(extractVisitor);
+//        }
+//    }
 
     public static boolean isMapValue(Type type) {
         List<InterfaceType> allinterface = null;
@@ -166,10 +166,10 @@ public class JMapValue extends JValue {
         }
     }
 
-    @Override
-    public void acceptExtract(JExtractVisitor jpa) {
-        jpa.extract(this);
-    }
+//    @Override
+//    public void acceptExtract(JExtractVisitor jpa) {
+//        jpa.extract(this);
+//    }
 
     public void acceptCreate(JCreateVisitor jcv) {
         jcv.create(this);

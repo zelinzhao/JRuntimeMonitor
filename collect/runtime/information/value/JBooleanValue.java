@@ -30,15 +30,15 @@ public class JBooleanValue extends JValue {
         return this.real;
     }
 
-    @Override
-    protected void extract() {
-        System.out.println(this.booleanv.type().name() + " " + name + " = " + this.booleanv.booleanValue());
-    }
-
-    @Override
-    public void acceptExtract(JExtractVisitor jpa) {
-        jpa.extract(this);
-    }
+//    @Override
+//    protected void extract() {
+//        System.out.println(this.booleanv.type().name() + " " + name + " = " + this.booleanv.booleanValue());
+//    }
+//
+//    @Override
+//    public void acceptExtract(JExtractVisitor jpa) {
+//        jpa.extract(this);
+//    }
 
     @Override
     protected void create() {
