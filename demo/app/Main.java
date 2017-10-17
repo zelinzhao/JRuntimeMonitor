@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 public class Main {
@@ -37,11 +38,12 @@ public class Main {
         PhD nullTutor = new PhD(10, "z", 10, null);
         PhD nullPhd = null;
         createPhD();
-
-        Iterator iter = m.objs.iterator();
+        
+        Set<String> keySet = m.maps.keySet();
+        Iterator iter = keySet.iterator();
         while(iter.hasNext()){
-            Object o = iter.next();
-            System.out.println(o.toString());
+            String key = (String) iter.next();
+            Object value = m.maps.get(key);
         }
     }
 }

@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import com.sun.jdi.BooleanValue;
 import com.sun.jdi.ClassNotLoadedException;
 import com.sun.jdi.ClassType;
 import com.sun.jdi.Field;
@@ -39,9 +40,12 @@ public class JMapValue extends JValue {
     public ElementNumberCondition getElementNumberCondition(){
         return this.elementNumberCondition;
     }
+    
+    /** key and value are put in order and correlated*/
     List<JValue> keyElements = new ArrayList<JValue>();
+    /** key and value are put in order and correlated*/
     List<JValue> valueElements = new ArrayList<JValue>();
-
+    
     HashMap<JValue, JValue> entryElements = new HashMap<JValue, JValue>();
 
 //    public JMapValue(ObjectReference object, ThreadReference eventthread, Field field) {
@@ -127,7 +131,6 @@ public class JMapValue extends JValue {
                         + ", which type is " + classtype.name());
                 return;
             }
-
             // get method
             Method getMethod = classtype.concreteMethodByName("get", "(Ljava/lang/Object;)Ljava/lang/Object;");
             if (getMethod == null) {
@@ -138,27 +141,42 @@ public class JMapValue extends JValue {
             // get key set
             Value keySetValue = object.invokeMethod(eventthread, keySetMethod, new ArrayList(),
                     ObjectReference.INVOKE_SINGLE_THREADED);
-            JSetValue jKeySetValue = (JSetValue) createFieldValue(currentfield, name, keySetValue.type(), keySetValue,this);
-            this.keyElements = jKeySetValue.elements;
-            for (JValue jOneKeyValue : this.keyElements) {
-                if (this.keyType == null)
-                    this.keyType = jKeySetValue.elementType;
+            //get iterator method
+            Method iteratorMethod = ((ClassType)keySetValue.type()).concreteMethodByName("iterator", "()Ljava/util/Iterator;");
+            //get iterator value
+            Value iteratorValue = ((ObjectReference)keySetValue).invokeMethod(this.eventthread, iteratorMethod,
+                    new ArrayList(), ObjectReference.INVOKE_SINGLE_THREADED);
+            //get hasNext method
+            Method hasNextMethod = ((ClassType)iteratorValue.type()).concreteMethodByName("hasNext", "()Z");
+            //get next method
+            Method nextMethod = ((ClassType)iteratorValue.type()).concreteMethodByName("next", "()Ljava/lang/Object;");
+            //iterator key and value
+            int index = 0;
+            Value hasNextReturn = ((ObjectReference)iteratorValue).invokeMethod(this.eventthread, hasNextMethod, new ArrayList(),
+                    ObjectReference.INVOKE_SINGLE_THREADED);
+            while(((BooleanValue)hasNextReturn).booleanValue()){  //has next element
+                Value nextReturn_key = ((ObjectReference)iteratorValue).invokeMethod(this.eventthread, nextMethod, 
+                        new ArrayList(), ObjectReference.INVOKE_SINGLE_THREADED);
                 List<Value> arguments = new ArrayList<Value>();
-                arguments.add(jOneKeyValue.getVmValue());
-                Value oneValueValue = object.invokeMethod(eventthread, getMethod, arguments,
+                arguments.add(nextReturn_key);
+                
+                Value getReturn_value = object.invokeMethod(this.eventthread, getMethod, arguments,
                         ObjectReference.INVOKE_SINGLE_THREADED);
-                JValue jOneValueValue;
-                if (oneValueValue == null) {
-                    jOneValueValue = createFieldValue(currentfield, jOneKeyValue.name, null, oneValueValue,this);
-                } else {
-                    jOneValueValue = createFieldValue(currentfield, jOneKeyValue.name, oneValueValue.type(), oneValueValue, this);
-                    if (this.valueType == null)
-                        this.valueType = jOneValueValue.getVmValue().type();
-                }
-                this.valueElements.add(jOneValueValue);
-                this.entryElements.put(jOneKeyValue, jOneValueValue);
+                JValue jv_key = createFieldValue(currentfield, "["+index+".key]", nextReturn_key.type(), nextReturn_key, this);
+                JValue jv_value = createFieldValue(currentfield, "["+index+".value]", getReturn_value.type(), getReturn_value, this);
+                
+                this.keyElements.add(jv_key);
+                this.keyType = nextReturn_key.type();
+                
+                this.valueElements.add(jv_value);
+                this.valueType = getReturn_value.type();
+                
+                this.entryElements.put(jv_key, jv_value);
+                
+                index++;
+                hasNextReturn = ((ObjectReference)iteratorValue).invokeMethod(this.eventthread, hasNextMethod, new ArrayList(),
+                        ObjectReference.INVOKE_SINGLE_THREADED);
             }
-
         } catch (InvalidTypeException | ClassNotLoadedException | IncompatibleThreadStateException
                 | InvocationException e) {
             // TODO Auto-generated catch block
