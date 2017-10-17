@@ -22,6 +22,7 @@ public class ElementNumberCondition extends Condition{
     @Override
     public String toString(){
         String result = super.toString()+",";
+        result += type+",";
         result += this.jvalue.getTopLevelClassName()+",";
         result += this.jvalue.getFieldPathAsString()+",";
         result += this.jvalue.getBottomLevelClassName()+",";

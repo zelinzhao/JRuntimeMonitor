@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.sun.jdi.ArrayReference;
+import com.sun.jdi.BooleanValue;
 import com.sun.jdi.ClassNotLoadedException;
 import com.sun.jdi.ClassType;
 import com.sun.jdi.Field;
@@ -101,19 +102,31 @@ public class JSetValue extends JValue {
                     ObjectReference.INVOKE_SINGLE_THREADED);
             this.size = ((IntegerValue) sizevalue).intValue();
 
-            // get each element
-            Method toArrayMethod = classtype.concreteMethodByName("toArray", "()[Ljava/lang/Object;");
-            if (toArrayMethod == null) {
-                System.out.println("cannot find toArray method, signature is ()[Ljava/lang/Object;, for " + name
-                        + ", which type is " + referencetype.name());
+            //get iterator
+            Method iteratorMethod = classtype.concreteMethodByName("iterator", "()Ljava/util/Iterator;");
+            if (iteratorMethod == null) {
+                System.out.println("No iterator ()Ljava/util/Iterator; method in this type " + object.type().name());
                 return;
             }
-            ArrayReference allElement = (ArrayReference) object.invokeMethod(this.eventthread, toArrayMethod,
-                    new ArrayList<Value>(), ObjectReference.INVOKE_SINGLE_THREADED);
-            JArrayValue arrayvalue = (JArrayValue) createFieldValue(currentfield, name, allElement.type(), allElement,this);
-            this.elements = arrayvalue.elements;
-            this.elementType = arrayvalue.elementType;
-
+            Value iteratorValue = object.invokeMethod(this.eventthread, iteratorMethod, new ArrayList(),
+                    ObjectReference.INVOKE_SINGLE_THREADED);
+            Method hasNextMethod = ((ClassType)iteratorValue.type()).concreteMethodByName("hasNext", "()Z");
+            Method nextMethod = ((ClassType)iteratorValue.type()).concreteMethodByName("next", "()Ljava/lang/Object;");
+            
+            int index = 0;
+            Value hasNextReturn = ((ObjectReference)iteratorValue).invokeMethod(this.eventthread, hasNextMethod, new ArrayList(),
+                    ObjectReference.INVOKE_SINGLE_THREADED);
+            while(((BooleanValue)hasNextReturn).booleanValue()){  //has next element
+                Value nextReturn = ((ObjectReference)iteratorValue).invokeMethod(this.eventthread, nextMethod, new ArrayList(),
+                        ObjectReference.INVOKE_SINGLE_THREADED);
+                String name = "["+index+"]";
+                JValue jv = createFieldValue(currentfield, name, nextReturn.type(), nextReturn, this);
+                this.elements.add(jv);
+                this.elementType = nextReturn.type();
+                index++;
+                hasNextReturn = ((ObjectReference)iteratorValue).invokeMethod(this.eventthread, hasNextMethod, new ArrayList(),
+                        ObjectReference.INVOKE_SINGLE_THREADED);
+            }
         } catch (InvalidTypeException | ClassNotLoadedException | IncompatibleThreadStateException
                 | InvocationException e) {
             // TODO Auto-generated catch block

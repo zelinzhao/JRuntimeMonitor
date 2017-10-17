@@ -26,8 +26,8 @@ public class JField extends Base {
      * @return field name if this field is not null, or return ""
      */
     public String getFieldAsString(){
-        if(this.name == null || this.name.length()==0)
-            return THIS_OBJ;
+//        if(this.name == null || this.name.length()==0)
+//            return THIS_OBJ;
         return this.name;
     }
 }

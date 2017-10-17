@@ -3,7 +3,7 @@ package collect.runtime.information.hierarchy;
 import com.sun.jdi.Type;
 
 public abstract class Base implements Cloneable {
-    protected final String THIS_OBJ = "this";
+    protected static final String THIS_OBJ = "this";
     /** the type, get from target vm. this thing belongs to. */
     Type type;
     /** the type name, this thing belongs to. */

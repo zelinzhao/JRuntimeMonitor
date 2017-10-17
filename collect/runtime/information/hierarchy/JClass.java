@@ -66,11 +66,11 @@ public class JClass extends Base {
         }
     }
 
-    public void extractObjsConditions() {
-        for (JObjectValue jov : this.instances.values()){
-            jov.extractConditions();
-        }
-    }
+//    public void extractObjsConditions() {
+//        for (JObjectValue jov : this.instances.values()){
+//            jov.extractConditions();
+//        }
+//    }
     public int getInstanceNumber(){
         return this.instances.size();
     }

@@ -45,11 +45,12 @@ public class JFieldPath implements Cloneable {
      */
     public String getFieldPathAsString(){
         String result = "";
-        for(JField jf: this.fieldPath){
-            String temp = jf.getFieldAsString();
-            if(result.length()!=0)
+        for(int i=0; i<this.fieldPath.size(); i++){
+            String temp = this.fieldPath.get(i).getFieldAsString();
+            if(result.length()!=0 && temp!=null && temp.length()!=0)
                 result+=".";
-            
+            if(i==0 && (temp==null || temp.length()==0))
+                result += Base.THIS_OBJ;
             if(temp.length()!=0)
                 result+= temp;
         }

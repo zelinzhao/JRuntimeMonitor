@@ -19,6 +19,8 @@ import collect.runtime.information.hierarchy.JField;
 
 public class JArrayValue extends JValue {
     ArrayReference array;
+    /** this elementType may be generic type, like java.lang.Object.
+     * the concrete type of each element may be different.*/
     Type elementType;
     
     private ElementNumberCondition elementNumberCondition;
@@ -71,7 +73,8 @@ public class JArrayValue extends JValue {
             int index = 0;
             for (Value elementvalue : array.getValues()) {
                 String name = "[" + index + "]";
-                JValue jv = createFieldValue(currentfield, name, elementType, elementvalue, this);
+                Type thisElementType = elementvalue.type();
+                JValue jv = createFieldValue(currentfield, name, thisElementType, elementvalue, this);
                 this.elements.add(jv);
                 index++;
             }

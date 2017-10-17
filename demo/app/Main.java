@@ -3,6 +3,7 @@ package demo.app;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -14,7 +15,6 @@ public class Main {
     Map<String, Object> maps = new HashMap<String, Object>();
     Object[] arrays = { "adf", 10, new Student(44, "stu44") };
     public Main(){
-        phds.add(null);
         phds.add(new PhD(22, "a", 3, null));
 
         objs.add("abcd");
@@ -28,13 +28,20 @@ public class Main {
     public static void createPhD() {
         Teacher teac = new Teacher(30, "ABC", "CS");
         PhD phd = new PhD(20, "ZZL", 4, teac);
-        Main m = new Main();
         phd.print();
     }
 
     public static void main(String[] args) {
+        Main m = new Main();
+
         PhD nullTutor = new PhD(10, "z", 10, null);
         PhD nullPhd = null;
         createPhD();
+
+        Iterator iter = m.objs.iterator();
+        while(iter.hasNext()){
+            Object o = iter.next();
+            System.out.println(o.toString());
+        }
     }
 }

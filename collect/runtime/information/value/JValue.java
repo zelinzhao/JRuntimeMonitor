@@ -33,6 +33,7 @@ import collect.runtime.information.hierarchy.JFieldPath;
 
 public abstract class JValue implements JCreateAccept{ // JExtractAccept 
     //TODO: there are some container classes needed to be implemented
+    //TODO: the wrapper classes, their typename are primitive not wrapper name.
     protected static final String NOT_NULL = "NOT_NULL";
     protected static final String NULL = "NULL";
     
@@ -182,6 +183,7 @@ public abstract class JValue implements JCreateAccept{ // JExtractAccept
 // primitive type ends here
         } else if (fieldValue == null) {
             JNullValue jnv = new JNullValue(fieldName,fieldType, currentField, fatherObj);
+            jnv.acceptCreate(createVisitor);
             return jnv;
         } else if (fieldType instanceof ReferenceType){
             ObjectReference objectReference = (ObjectReference) fieldValue;

@@ -11,11 +11,13 @@ public class PhD extends Student{
     static int ttttttttttttt = 1111;
     private int grade;
     private Teacher tutor;
+    private Integer integer;
     
     public PhD(int ID, String name, int grade, Teacher tutor){
         super(ID,name);
         this.grade = grade;
         this.tutor = tutor;
+        this.integer = 100;
     }
     
     public void print(){

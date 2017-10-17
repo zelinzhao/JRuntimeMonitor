@@ -138,7 +138,6 @@ public class JObjectValue extends JValue {
                     this.staticFieldValues.put(fieldname, jv);
                 else
                     this.fieldValues.put(fieldname, jv);
-
             }
         } catch (ClassNotLoadedException e) {
             // TODO Auto-generated catch block
