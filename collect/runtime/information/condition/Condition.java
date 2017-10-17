@@ -9,7 +9,6 @@ enum Operator{
 }
 
 /**
- * 
  * @author Zelin Zhao
  * Condition.
  * There may be some conditions for one point. You should pay attention to the output and input format. 
