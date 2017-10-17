@@ -22,6 +22,7 @@ import com.sun.jdi.Value;
 
 import collect.runtime.information.condition.ElementNumberCondition;
 import collect.runtime.information.hierarchy.JField;
+import collect.runtime.information.main.VMInfo;
 
 public class JSetValue extends JValue {
     ObjectReference object;
@@ -79,10 +80,10 @@ public class JSetValue extends JValue {
         return false;
     }
 
-    protected void create() {
+    protected boolean create() {
         if (alreadyObj.containsKey(this.object.uniqueID()))
             // TODO recursive reference
-            return;
+            return false;
         alreadyObj.put(this.object.uniqueID(), this.object);
         try {
             this.genericSign = this.currentfield.genericSignature();
@@ -91,22 +92,27 @@ public class JSetValue extends JValue {
 
             JField jf = new JField(referencetype, referencetype.name(), this.name, this.currentfield);
             this.fieldPath.addFieldToPath(jf);
-
+            if(this.meetFieldDepth())
+                return false;
             // get size of this set
             Method sizemethod = classtype.concreteMethodByName("size", "()I");
             if (sizemethod == null) {
                 System.out.println("No size ()I method in this type " + object.type().name());
-                return;
+                return false;
             }
             Value sizevalue = object.invokeMethod(this.eventthread, sizemethod, new ArrayList(),
                     ObjectReference.INVOKE_SINGLE_THREADED);
             this.size = ((IntegerValue) sizevalue).intValue();
 
+            //VMInfo level
+            if(!VMInfo.intoReferenceObjectAndContainerElement())
+                return true;
+            
             //get iterator
             Method iteratorMethod = classtype.concreteMethodByName("iterator", "()Ljava/util/Iterator;");
             if (iteratorMethod == null) {
                 System.out.println("No iterator ()Ljava/util/Iterator; method in this type " + object.type().name());
-                return;
+                return false;
             }
             Value iteratorValue = object.invokeMethod(this.eventthread, iteratorMethod, new ArrayList(),
                     ObjectReference.INVOKE_SINGLE_THREADED);
@@ -132,6 +138,7 @@ public class JSetValue extends JValue {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
+        return true;
     }
 
 //    @Override

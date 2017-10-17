@@ -5,6 +5,7 @@ import com.sun.jdi.LongValue;
 import com.sun.jdi.Value;
 
 import collect.runtime.information.hierarchy.JField;
+import collect.runtime.information.main.VMInfo;
 
 public class JLongValue extends JValue {
     LongValue longv;
@@ -41,9 +42,12 @@ public class JLongValue extends JValue {
 //    }
 
     @Override
-    protected void create() {
+    protected boolean create() {
         JField jf = new JField(this.longv.type(), this.longv.type().name(), this.name, this.currentfield);
         this.fieldPath.addFieldToPath(jf);
+        if(this.meetFieldDepth())
+            return false;
+        return true;
     }
 
     @Override

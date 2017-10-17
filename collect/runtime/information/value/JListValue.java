@@ -20,6 +20,7 @@ import com.sun.jdi.Value;
 
 import collect.runtime.information.condition.ElementNumberCondition;
 import collect.runtime.information.hierarchy.JField;
+import collect.runtime.information.main.VMInfo;
 
 public class JListValue extends JValue {
     ObjectReference object;
@@ -85,13 +86,16 @@ public class JListValue extends JValue {
         return false;
     }
 
-    protected void create() {
+    protected boolean create() {
         if (alreadyObj.containsKey(this.object.uniqueID()))
             // TODO recursive reference
-            return;
+            return false;
         alreadyObj.put(this.object.uniqueID(), this.object);
         JField jf = new JField(this.object.type(), this.object.type().name(), this.name, this.currentfield);
         this.fieldPath.addFieldToPath(jf);
+        if(this.meetFieldDepth())
+            return false;
+
         try {
             this.genericSign = this.currentfield.genericSignature();
             ClassType classtype = (ClassType) object.type();
@@ -101,17 +105,20 @@ public class JListValue extends JValue {
             Method sizemethod = classtype.concreteMethodByName("size", "()I");
             if (sizemethod == null) {
                 System.out.println("No size ()I method in this type " + object.type().name());
-                return;
+                return false;
             }
             Value sizevalue = object.invokeMethod(this.eventthread, sizemethod, new ArrayList(),
                     ObjectReference.INVOKE_SINGLE_THREADED);
             this.size = ((IntegerValue) sizevalue).intValue();
+          //VMInfo level
+            if(!VMInfo.intoReferenceObjectAndContainerElement())
+                return true;
             // get each element
             Method getmethod = classtype.concreteMethodByName("get", "(I)Ljava/lang/Object;");
             if (getmethod == null) {
                 System.out.println("cannot find get method, signature is (I)Ljava/lang/Object;, for " + name
                         + ", which type is " + referencetype.name());
-                return;
+                return false;
             }
             for (int i = 0; i < size; i++) {
                 IntegerValue intvalue = this.object.virtualMachine().mirrorOf(i);
@@ -134,6 +141,7 @@ public class JListValue extends JValue {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
+        return true;
     }
 
 //    @Override

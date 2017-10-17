@@ -5,6 +5,7 @@ import com.sun.jdi.StringReference;
 import com.sun.jdi.Value;
 
 import collect.runtime.information.hierarchy.JField;
+import collect.runtime.information.main.VMInfo;
 
 public class JStringValue extends JValue {
 
@@ -40,9 +41,12 @@ public class JStringValue extends JValue {
 //    }
 
     @Override
-    protected void create() {
+    protected boolean create() {
         JField jf = new JField(this.string.type(), this.string.type().name(), this.name, this.currentfield);
         this.fieldPath.addFieldToPath(jf);
+        if(this.meetFieldDepth())
+            return false;
+        return true;
     }
 
     @Override

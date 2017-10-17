@@ -106,15 +106,17 @@ public class JObjectValue extends JValue {
         return NOT_NULL;
     }
 
-    protected void create() {
+    protected boolean create() {
         // only consider objectreference type
         if (!(this.object instanceof ObjectReference)) {
             System.out.println("Object is unsupported type " + this.object.type().name());
-            return;
+            return false;
         }
 
         JField f = new JField(this.type, this.type.name(), this.name, this.currentfield);
         this.fieldPath.addFieldToPath(f);
+        if(this.meetFieldDepth())
+            return false;
 
         // recurrence reference occured
         if (this.alreadyObj.containsKey(this.object.uniqueID())) {
@@ -122,10 +124,14 @@ public class JObjectValue extends JValue {
                     + this.alreadyObj.get(this.object.uniqueID()));
             // TODO recurrence reference is not perfect. especially print and
             // compare
-            return;
+            return false;
         }
         this.alreadyObj.put(this.object.uniqueID(), this.object);
 
+      //VMInfo level
+        if(!VMInfo.intoReferenceObjectAndContainerElement())
+            return true;
+        
         try {
             for (Field loopfield : this.type.visibleFields()) {
                 if (loopfield.isSynthetic())
@@ -143,6 +149,7 @@ public class JObjectValue extends JValue {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
+        return true;
     }
 
     public void createObject() {

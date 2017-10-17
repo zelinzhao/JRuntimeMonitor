@@ -46,9 +46,12 @@ public class JIntegerValue extends JValue {
 //    }
 
     @Override
-    protected void create() {
+    protected boolean create() {
         JField jf = new JField(this.integer.type(), this.integer.type().name(), this.name, this.currentfield);
         this.fieldPath.addFieldToPath(jf);
+        if(this.meetFieldDepth())
+            return false;
+        return true;
     }
 
     @Override

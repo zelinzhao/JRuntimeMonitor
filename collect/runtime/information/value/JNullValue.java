@@ -5,6 +5,7 @@ import com.sun.jdi.Type;
 import com.sun.jdi.Value;
 
 import collect.runtime.information.hierarchy.JField;
+import collect.runtime.information.main.VMInfo;
 
 public class JNullValue extends JValue {
     Type type;
@@ -35,13 +36,16 @@ public class JNullValue extends JValue {
     }
 
     @Override
-    protected void create() {
+    protected boolean create() {
         JField jf = null;
         if (type == null)
             jf = new JField(null, null, this.name, this.currentfield);
         else
             jf = new JField(type, type.name(), name, this.currentfield);
         this.fieldPath.addFieldToPath(jf);
+        if(this.meetFieldDepth())
+            return false;
+        return true;
     }
 
 //    @Override

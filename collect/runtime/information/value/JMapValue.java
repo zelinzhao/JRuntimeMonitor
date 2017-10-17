@@ -25,6 +25,7 @@ import com.sun.jdi.Value;
 
 import collect.runtime.information.condition.ElementNumberCondition;
 import collect.runtime.information.hierarchy.JField;
+import collect.runtime.information.main.VMInfo;
 
 public class JMapValue extends JValue {
     ObjectReference object;
@@ -100,14 +101,17 @@ public class JMapValue extends JValue {
         return false;
     }
 
-    protected void create() {
+    protected boolean create() {
         if (alreadyObj.containsKey(this.object.uniqueID()))
             // TODO recursive reference
-            return;
+            return false;
         alreadyObj.put(this.object.uniqueID(), this.object);
 
         JField jf = new JField(this.object.type(), this.object.type().name(), this.name, this.currentfield);
         this.fieldPath.addFieldToPath(jf);
+        if(this.meetFieldDepth())
+            return false;
+
         try {
             this.genericSign = this.currentfield.genericSignature();
             ClassType classtype = (ClassType) object.type();
@@ -116,27 +120,28 @@ public class JMapValue extends JValue {
             Method sizemethod = classtype.concreteMethodByName("size", "()I");
             if (sizemethod == null) {
                 System.out.println("No size ()I method in this type " + object.type().name());
-                return;
+                return false;
             }
             Value sizevalue = object.invokeMethod(this.eventthread, sizemethod, new ArrayList(),
                     ObjectReference.INVOKE_SINGLE_THREADED);
             this.size = ((IntegerValue) sizevalue).intValue();
-
-            System.out.println("map size: " + this.size);
+          //VMInfo level
+            if(!VMInfo.intoReferenceObjectAndContainerElement())
+                return true;
 
             // keySet method
             Method keySetMethod = classtype.concreteMethodByName("keySet", "()Ljava/util/Set;");
             if (keySetMethod == null) {
                 System.out.println("cannot find keySet method, signature is ()Ljava/util/Set;, for " + name
                         + ", which type is " + classtype.name());
-                return;
+                return false;
             }
             // get method
             Method getMethod = classtype.concreteMethodByName("get", "(Ljava/lang/Object;)Ljava/lang/Object;");
             if (getMethod == null) {
                 System.out.println("cannot find get method, signature is (Ljava/lang/Object;)Ljava/lang/Object;, for "
                         + name + ", which type is " + classtype.name());
-                return;
+                return false;
             }
             // get key set
             Value keySetValue = object.invokeMethod(eventthread, keySetMethod, new ArrayList(),
@@ -182,6 +187,7 @@ public class JMapValue extends JValue {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
+        return true;
     }
 
 //    @Override

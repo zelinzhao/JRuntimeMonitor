@@ -16,14 +16,14 @@ public class Main {
     Map<String, Object> maps = new HashMap<String, Object>();
     Object[] arrays = { "adf", 10, new Student(44, "stu44") };
     public Main(){
-        phds.add(new PhD(22, "a", 3, null));
+        phds.add(new PhD(22, "a", 3, new Teacher(30, "ABC", "CS")));
 
         objs.add("abcd");
         objs.add(12);
         objs.add(new Student(100, "stu100"));
 
         maps.put("a", new Student(23, "stu23"));
-        maps.put("h", new PhD(30, "30", 30, null));
+        maps.put("h", new PhD(30, "30", 30, new Teacher(30, "ABC", "CS")));
     }
 
     public static void createPhD() {

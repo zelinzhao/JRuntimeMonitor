@@ -55,7 +55,14 @@ public class JFieldPath implements Cloneable {
                 result+= temp;
         }
         return result;
-        
+    }
+    
+    /**
+     * 
+     * @return the depth of current bottom field. Used for controlling depth
+     */
+    public int getDepth(){
+        return this.fieldPath.size();
     }
     
     

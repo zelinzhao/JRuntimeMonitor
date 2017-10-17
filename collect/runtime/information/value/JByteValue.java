@@ -5,6 +5,7 @@ import com.sun.jdi.Field;
 import com.sun.jdi.Value;
 
 import collect.runtime.information.hierarchy.JField;
+import collect.runtime.information.main.VMInfo;
 
 public class JByteValue extends JValue {
     ByteValue bytev;
@@ -42,9 +43,12 @@ public class JByteValue extends JValue {
 //    }
 
     @Override
-    protected void create() {
+    protected boolean create() {
         JField jf = new JField(this.bytev.type(), this.bytev.type().name(), this.name, this.currentfield);
         this.fieldPath.addFieldToPath(jf);
+        if(this.meetFieldDepth())
+            return false;
+        return true;
     }
 
     @Override

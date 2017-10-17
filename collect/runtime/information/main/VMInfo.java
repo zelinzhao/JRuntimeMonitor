@@ -24,7 +24,7 @@ enum Level {
     ONE,
     /**
      * active methods' name and primitive-type fields' value. size of array,
-     * list, set or map.
+     * list, set or map. object number.
      */
     TWO,
     /**
@@ -44,20 +44,9 @@ public class VMInfo {
     /** for input conditions. point id and conditions */
     public static HashMap<String, List<Condition>> inputConditions = new HashMap<String, List<Condition>>();
     /** default is 1 */
-    private static Level LEVEL = Level.ONE;
+    public static Level LEVEL = Level.ONE;
     /** default is 1. 0 is no limit. */
-    private static int DEPTH = 1;
-    /**
-     * used for external classes while extracting conditions. Should be
-     * re-initialized at each stop point.
-     */
-    public static Level EXTERNAL_LEVEL = LEVEL;
-    /**
-     * used for external classes while extracting conditions. Should be
-     * re-initialized at each stop point.
-     */
-    public static int EXTERNAL_DEPTH = DEPTH;
-    ///////
+    public static int DEPTH = 1;
 
     public void addObjClass(String objClass) {
         this.objClasses.add(objClass);
@@ -88,9 +77,18 @@ public class VMInfo {
         }
     }
 
+    /**
+     * If LEVEL is THREE, this tool will go into reference object and element in container classes.
+     * If LEVEL is TWO, this tool will get NULL/NOT_NULL of reference object and NULL/element_number of container classes.
+     * If LEVEL is ONE, this tool only monitor methods on stacks.
+     * @return
+     */
+    public static boolean intoReferenceObjectAndContainerElement(){
+        if(LEVEL == Level.THREE)
+            return true;
+        return false;
+    }
     public void clearInfo() {
-        EXTERNAL_LEVEL = LEVEL;
-        EXTERNAL_DEPTH = DEPTH;
         outputConditions.clear();
         for (String objCla : this.objClasses)
             this.targetJClasses.put(objCla, null);
@@ -111,19 +109,22 @@ public class VMInfo {
             e.printStackTrace();
         }
         // get instances of targeted classes, level is two or three
-        if (LEVEL == Level.TWO || LEVEL == Level.THREE)
+        if (LEVEL == Level.TWO || LEVEL == Level.THREE){
+            //here is first step of iterating through objects and fields.
             for (String className : this.objClasses) {
                 List<ReferenceType> referTypes = vm.classesByName(className);
                 if (!referTypes.isEmpty()) {
                     ReferenceType oneType = referTypes.get(0);
                     // Conditions are created in JCreateVisitorImplement while
                     // creating objects
-                    // here, fieldname is null, using "".
+                    // here, fieldname is null, using "" or null.
                     JClass jclass = new JClass(oneType, null, eventThread);
                     outputConditions.add(new ObjectNumberCondition(jclass));
                     this.targetJClasses.put(className, jclass);
                 }
             }
+            
+        }
     }
 
     public void printConditions() {

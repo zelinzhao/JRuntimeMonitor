@@ -16,6 +16,7 @@ import com.sun.jdi.VoidValue;
 
 import collect.runtime.information.condition.ElementNumberCondition;
 import collect.runtime.information.hierarchy.JField;
+import collect.runtime.information.main.VMInfo;
 
 public class JArrayValue extends JValue {
     ArrayReference array;
@@ -58,18 +59,24 @@ public class JArrayValue extends JValue {
 //        }
 //    }
     @Override
-    protected void create() {
+    protected boolean create() {
         try {
             if (alreadyObj.containsKey(this.array.uniqueID()))
                 // TODO recursive reference
-                return;
+                return false;
             alreadyObj.put(this.array.uniqueID(), this.array);
             ArrayType arraytype = (ArrayType) array.referenceType();
 
             JField jf = new JField(arraytype, arraytype.name(), this.name, this.currentfield);
             this.fieldPath.addFieldToPath(jf);
-
+            if(this.meetFieldDepth())
+                return false;
+            
             this.elementType = arraytype.componentType();
+          //VMInfo level
+            if(!VMInfo.intoReferenceObjectAndContainerElement())
+                return true;
+            //get each element
             int index = 0;
             for (Value elementvalue : array.getValues()) {
                 String name = "[" + index + "]";
@@ -82,6 +89,7 @@ public class JArrayValue extends JValue {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
+        return true;
     }
 
 //    @Override
