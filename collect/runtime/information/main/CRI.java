@@ -111,15 +111,9 @@ public class CRI {
             } else if (token.equals("-stopat")) {
                 String points = argv[++i];
                 for (String str : points.split(",")) {
-                    if (str.contains("-")) {
-                        MethodPoint mp = new MethodPoint(str);
-                        vmcmds.addCmd(mp);
-                        vminfo.addObjClass(mp.getFullClassName());
-                    } else {
-                        LinePoint lp = new LinePoint(str);
-                        vmcmds.addCmd(lp);
-                        vminfo.addObjClass(lp.getFullClassName());
-                    }
+                    ProgramPoint pp = new ProgramPoint(str);
+                    vmcmds.addCmd(pp);
+                    vminfo.addObjClass(pp.getFullClassName());
                 }
             } else if (inArgvs) {
                 String arg = argv[i];

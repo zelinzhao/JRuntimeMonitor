@@ -56,9 +56,7 @@ public class VMCmds{
         if(!this.stopCmds.containsKey(locClass))
             return null;
         for(ProgramPoint pp: this.stopCmds.get(locClass))
-            if( ( pp instanceof MethodPoint ) && ((MethodPoint)pp).equals(locClass, locMetName, locMetDesc, lineNo))
-                return pp;
-            else if( (pp instanceof LinePoint) && ((LinePoint)pp).equals(locClass, lineNo))
+            if(pp.equals(locClass, locMetName, locMetDesc, lineNo))
                 return pp;
         return null;
     }

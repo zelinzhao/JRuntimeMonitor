@@ -43,6 +43,7 @@ import com.sun.jdi.request.ClassPrepareRequest;
 import com.sun.jdi.request.EventRequest;
 import com.sun.jdi.request.EventRequestManager;
 import com.sun.jdi.request.MethodEntryRequest;
+import com.sun.jdi.request.MethodExitRequest;
 import com.sun.jdi.request.ModificationWatchpointRequest;
 
 import collect.runtime.information.hierarchy.JClass;
@@ -203,9 +204,10 @@ public class VMConnection extends VM {
             
             //print all targeted objects here
         } else if ((event instanceof VMDisconnectEvent) || (event instanceof VMDeathEvent)) {
-            connected = false;
+            this.connected = false;
             this.output.connected = false;
             this.errorout.connected = false;
+            this.info.closeWriter();
         }
     }
 
@@ -215,28 +217,27 @@ public class VMConnection extends VM {
                 printMessage("the following stop point may be incorrect");
                 printMessage(cmd.toString());
             } else if (cmd.isLinePoint()) {
-                List<Location> location = classref.locationsOfLine(((LinePoint)cmd).getLineNo());
+                List<Location> location = classref.locationsOfLine(cmd.getLineNo());
                 if(location!=null && location.size()>0)
                     createBreakPointRequest(location.get(0));
             } else {
+                //here, jdi can only stop at a class's methods entry/exit (all method)
+                //jdi cannot stop at some specific method's entry/exit.
+                //So I use location list of a method and stop at the first (entry) and last (exit) location.
+                //If stop at all methods' entry/exit of a class, it is not efficient.
                 ClassType classtype = (ClassType) classref;
-                MethodPoint mp = (MethodPoint)cmd;
-                if (mp.getMethodDesc() == null) {
-                    printMessage("need method signature for method: " + mp.getMethodName());
-                    return;
-                }
-                Method method = classtype.concreteMethodByName(mp.getMethodName(), mp.getMethodDesc());
+                Method method = classtype.concreteMethodByName(cmd.getMethodName(), cmd.getMethodDesc());
                 if (method == null) {
-                    printMessage("no method " + mp.getMethodName() + " " + mp.getMethodDesc() + " in " + classref.name());
+                    printMessage("no method " + cmd.getMethodName() + " " + cmd.getMethodDesc() + " in " + classref.name());
                     return;
                 } else {
                     List<Location> locations = method.allLineLocations();
-                    if (mp.isMethodEnter()) {
+                    if (cmd.isMethodEnter()) {
                         createBreakPointRequest(locations.get(0));
-                        mp.setLineNo(locations.get(0).lineNumber());
-                    } else if (mp.isMethodExit()) {
+                        cmd.setLineNo(locations.get(0).lineNumber());
+                    } else if (cmd.isMethodExit() && locations.size()>1) {
                         createBreakPointRequest(locations.get(locations.size() - 1));
-                        mp.setLineNo(locations.get(locations.size()-1).lineNumber());
+                        cmd.setLineNo(locations.get(locations.size()-1).lineNumber());
                     }
                 }
             }

@@ -1,3 +1,3 @@
 -objclass demo.app.Main,demo.app.PhD,demo.app.Student,demo.app.Teacher -vmcp E:\Eclipse\CollectRuntimeInformation\bin \
--main demo.app.Main -stopat demo.app.PhD-print-()V:enter,demo.app.PhD-print-()V:exit,demo.app.Student:25 -level 3 -depth 0 \
--output E:\Eclipse\conditions.txt
+-main demo.app.Main -stopat demo.app.PhD-print-()V:enter,demo.app.PhD-print-()V:exit,demo.app.Student:25,demo.app.Main-main-([Ljava/lang/String;)V:exit \
+-level 3 -depth 0 -output E:\Eclipse\conditions.txt

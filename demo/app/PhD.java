@@ -20,9 +20,14 @@ public class PhD extends Student{
         this.integer = 100;
     }
     
-    public void print(){
+    public void print()
+    
+    {
+        
         super.print();
+        
         System.out.println(this.grade);
-        this.tutor.print();
-    }
+        
+        this.tutor.print();  
+        }
 }

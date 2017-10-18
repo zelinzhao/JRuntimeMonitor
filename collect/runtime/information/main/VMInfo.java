@@ -162,11 +162,7 @@ public class VMInfo {
     }
 
     public void printConditions(ProgramPoint stopPoint) throws IOException {
-        String conStr = "";
-        if (stopPoint instanceof MethodPoint)
-            conStr = "@@," + ((MethodPoint) stopPoint).toString();
-        else if (stopPoint instanceof LinePoint)
-            conStr = "@@," + ((LinePoint) stopPoint).toString();
+        String conStr = "@@,"+ stopPoint.toString();
 
         if (this.writer != null) {
             writer.write(conStr);
@@ -198,5 +194,14 @@ public class VMInfo {
 
     private void printMessage(String message) {
         System.out.println("[vm] message: " + message);
+    }
+    
+    public void closeWriter(){
+        try {
+            this.writer.close();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 }

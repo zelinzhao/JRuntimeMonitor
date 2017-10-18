@@ -9,6 +9,7 @@ import collect.runtime.information.condition.ElementNumberCondition;
 import collect.runtime.information.condition.FieldValueCondition;
 import collect.runtime.information.condition.MethodExistCondition;
 import collect.runtime.information.condition.ObjectNumberCondition;
+import collect.runtime.information.main.ProgramPoint;
 
 public class ReadConditions {
 
@@ -27,16 +28,17 @@ public class ReadConditions {
     public void readConditions() throws IOException {
         String temp = reader.readLine();
         while (temp != null) {
-            String[] sp = temp.split(",");
+            //clear all whitespace
+            String[] sp = temp.replaceAll("\\s", "").split(",");
             // sp[0] defines a stop point or a condition
             switch (sp[0]) {
-                case "@@": // it is a stop point
-
+                case "@@":{ // it is a stop point
+                    ProgramPoint pp = new ProgramPoint(sp[1]);
                     break;
-                default: // it is a condition
-
+                }
+                default:{ // it is a condition
+                }
             }
-
             temp = reader.readLine();
         }
         reader.close();
