@@ -3,7 +3,7 @@ package collect.runtime.information.condition;
 import collect.runtime.information.hierarchy.JClass;
 
 public class ObjectNumberCondition extends Condition{
-    private static final String type = "OBJECT";
+    public static final String type = "OBJECT";
     private JClass jclass;
     private int number;
     

@@ -5,31 +5,16 @@ enum PointLoc{
 }
 
 public abstract class ProgramPoint {
-    protected String packageName ="";
-    protected String className ="";
+    protected String fullClassName="";
     protected PointLoc loc = PointLoc.OTHER;
     
-    public ProgramPoint(String packageName, String className, PointLoc loc){
-        this.packageName = packageName;
-        this.className = className;
+    public ProgramPoint(String fullClassName, PointLoc loc){
+        this.fullClassName = fullClassName;
         this.loc = loc;
     }
     
-    public void setPackageName(String packageName){
-        this.packageName = packageName;
-    }
-    public void setClassName(String className){
-        this.className = className;
-    }
-    
-    public String getPackageName(){
-        return this.packageName;
-    }
-    public String getClassName(){
-        return this.className;
-    }
     public String getFullClassName(){
-        return this.packageName+"."+this.className;
+        return this.fullClassName;
     }
     
     public PointLoc getLoc(){
@@ -61,6 +46,23 @@ public abstract class ProgramPoint {
     }
     @Override
     public String toString(){
-        return this.packageName+"."+this.className;
+        return this.fullClassName;
+    }
+    
+    @Override
+    public boolean equals(Object obj){
+        if(obj==null)
+            return false;
+        if( !(obj instanceof ProgramPoint))
+            return false;
+        ProgramPoint pp = (ProgramPoint)obj;
+        
+        if(!pp.fullClassName.equals(this.fullClassName) || pp.loc!=this.loc)
+            return false;
+        return true;
+    }
+    
+    public boolean equals(String fullClassName){
+        return this.fullClassName.equals(fullClassName);
     }
 }

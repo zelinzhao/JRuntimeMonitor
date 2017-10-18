@@ -187,14 +187,19 @@ public class VMConnection extends VM {
             this.info.clearInfo();
             
             BreakpointEvent breakevent = (BreakpointEvent) event;
-            String locMetName = breakevent.location().method().name();
-            String locMetDesc = breakevent.location().method().signature();
-            String locCla = breakevent.location().declaringType().name();
-            printMessage("stop in " + locCla + "." + locMetName+"-"+locMetDesc + " at line " + breakevent.location().lineNumber());
-            
+            ProgramPoint pp = this.cmds.getStopCmdsByEvent(breakevent);
+            if(pp==null){
+                printMessage("stop a an unrecognized point");
+                return;
+            }
+            // @@,package.class, method, descriptor
             this.eventthread = breakevent.thread();
             this.info.createObjectsAndConditions(vm, eventthread);
-            this.info.printConditions();
+            try {
+                this.info.printConditions(pp);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
             
             //print all targeted objects here
         } else if ((event instanceof VMDisconnectEvent) || (event instanceof VMDeathEvent)) {
@@ -228,8 +233,10 @@ public class VMConnection extends VM {
                     List<Location> locations = method.allLineLocations();
                     if (mp.isMethodEnter()) {
                         createBreakPointRequest(locations.get(0));
+                        mp.setLineNo(locations.get(0).lineNumber());
                     } else if (mp.isMethodExit()) {
                         createBreakPointRequest(locations.get(locations.size() - 1));
+                        mp.setLineNo(locations.get(locations.size()-1).lineNumber());
                     }
                 }
             }

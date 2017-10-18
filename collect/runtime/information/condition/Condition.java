@@ -14,7 +14,8 @@ enum Operator{
  * There may be some conditions for one point. You should pay attention to the output and input format. 
  */
 /*output format:
- *      @@package.class, method, descriptor
+ *      @@,package.class-lineno
+ *      @@,package.class-method-descriptor-enter/exit
  *          (e.g. the point id)
  *      ++,EXIST, package.class, method, descriptor
  *          (e.g. existing a method in stack at this point)
@@ -28,9 +29,9 @@ enum Operator{
  */
 /*
  * input format:
- *      @@package.class, method, descriptor
+ *      @@,package.class-lineno
+ *      @@,package.class-method-descriptor-enter/exit
  *          (e.g. the point id)
-
  *      --,EXIST, package.class, method, descriptor
  *          (e.g. can apply update at this point if the method is NOT active)
  *      ++,EXIST, package.class, method, descriptor

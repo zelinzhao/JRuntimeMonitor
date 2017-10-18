@@ -4,7 +4,7 @@ import collect.runtime.information.hierarchy.JFieldPath;
 import collect.runtime.information.value.JValue;
 
 public class ElementNumberCondition extends Condition{
-    private static final String type = "ELEMENT";
+    public static final String type = "ELEMENT";
     private JValue jvalue;
     private int number;
     

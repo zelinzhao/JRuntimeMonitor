@@ -2,19 +2,15 @@ package collect.runtime.information.main;
 
 public class LinePoint extends ProgramPoint{
     private int lineNo;
-    public LinePoint(String packageName, String className) {
-        super(packageName, className, PointLoc.LINE);
-    }
-    
-    public LinePoint(String packageName, String className, int lineNo){
-        this(packageName, className);
+
+    public LinePoint(String fullClassName, int lineNo){
+        super(fullClassName, PointLoc.LINE);
         this.lineNo = lineNo;
     }
     
     public LinePoint(String point){
-        super(null,null,PointLoc.LINE);
-        this.packageName = point.substring(0, point.lastIndexOf('.'));
-        this.className = point.substring(point.lastIndexOf('.')+1, point.indexOf(':'));
+        super(null,PointLoc.LINE);
+        this.fullClassName = point.substring(0,point.indexOf(':'));
         this.lineNo = Integer.valueOf(point.substring(point.indexOf(':')+1));
     }
     
@@ -29,6 +25,25 @@ public class LinePoint extends ProgramPoint{
     @Override
     public String toString(){
         return super.toString()+":"+this.lineNo;
+    }
+    
+    @Override
+    public boolean equals(Object obj){
+        if( !super.equals(obj))
+            return false;
+        if( !(obj instanceof LinePoint))
+            return false;
+        LinePoint lp = (LinePoint)obj;
+        if(lp.lineNo != this.lineNo)
+            return false;
+        return true;
+    }
+    public boolean equals(String className, int lineNo){
+        if( !super.equals(className) )
+            return false;
+        if( this.lineNo != lineNo)
+            return false;
+        return true;
     }
 
 }

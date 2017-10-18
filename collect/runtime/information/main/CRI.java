@@ -30,6 +30,7 @@ public class CRI {
     private static void usage() {
         System.out.println("usage for Collect Runtime Information:\n"
                 + "-objclass class1,class2 -vmcp classpath -main mainclass -args arg1 arg2 -stopat point1,point2 -level 1 -depth 1\n"
+                + "-output /path/to/file/storing/points/and/conditions -input /path/to/file/reading/points/and/conditions"
                 + "In detail:\n"
                 + "     -objclass package.class1,package.class2 (CRI traces objects of these classes)\n"
                 + "         (Usually they are changed classes. May be not provided.)\n"
@@ -57,7 +58,9 @@ public class CRI {
                 + "         0 (iterate through fields, no matter the depth is.)\n"
                 + "         other number\n"
                 + "         default is 1\n"
-                + "         while -level is 1, depth is 1.");
+                + "         while -level is 1, depth is 1.\n"
+                + " -output /path/to/a/file (storing stop points and corresponding conditions to this file)\n"
+                + " -input /path/to/a/file (reading stop points and corresponding conditions from this file)");
     }
 
     private static void usageError(String message) {
@@ -82,7 +85,6 @@ public class CRI {
         VMInfo vminfo = new VMInfo();
 
         boolean inArgvs = false;
-        
         for (int i = 0; i < argv.length; i++) {
             String token = argv[i];
             if (token.equals("-objclass")) {
@@ -131,6 +133,10 @@ public class CRI {
             } else if(token.equals("-depth")){
                 depth = Integer.valueOf(argv[++i]);
             } else if(token.equals("\\")){
+            } else if(token.equals("-output")){
+                vminfo.setOutputFile(argv[++i]);
+            } else if(token.equals("-input")){
+                vminfo.setInputFile(argv[++i]);
             } else {
                 usageError("Something is wrong. Please see the usage information.");
             }

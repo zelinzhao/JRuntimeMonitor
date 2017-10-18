@@ -1,5 +1,11 @@
 package collect.runtime.information.main;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -48,6 +54,31 @@ public class VMInfo {
     /** default is 1. 0 is no limit. */
     public static int DEPTH = 1;
 
+    /** writing stop points and corresponding conditions to this file */
+    private String outputFile;
+    private BufferedWriter writer;
+    /** reading stop points and corresponding conditions from this file */
+    private String inputFile;
+    private BufferedReader reader;
+
+    public void setOutputFile(String outputFile) {
+        this.outputFile = outputFile;
+        try {
+            writer = new BufferedWriter(new FileWriter(this.outputFile));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void setInputFile(String inputFile) {
+        this.inputFile = inputFile;
+        try {
+            reader = new BufferedReader(new FileReader(this.inputFile));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
     public void addObjClass(String objClass) {
         this.objClasses.add(objClass);
     }
@@ -78,16 +109,19 @@ public class VMInfo {
     }
 
     /**
-     * If LEVEL is THREE, this tool will go into reference object and element in container classes.
-     * If LEVEL is TWO, this tool will get NULL/NOT_NULL of reference object and NULL/element_number of container classes.
-     * If LEVEL is ONE, this tool only monitor methods on stacks.
+     * If LEVEL is THREE, this tool will go into reference object and element in
+     * container classes. If LEVEL is TWO, this tool will get NULL/NOT_NULL of
+     * reference object and NULL/element_number of container classes. If LEVEL
+     * is ONE, this tool only monitor methods on stacks.
+     * 
      * @return
      */
-    public static boolean intoReferenceObjectAndContainerElement(){
-        if(LEVEL == Level.THREE)
+    public static boolean intoReferenceObjectAndContainerElement() {
+        if (LEVEL == Level.THREE)
             return true;
         return false;
     }
+
     public void clearInfo() {
         outputConditions.clear();
         for (String objCla : this.objClasses)
@@ -109,8 +143,8 @@ public class VMInfo {
             e.printStackTrace();
         }
         // get instances of targeted classes, level is two or three
-        if (LEVEL == Level.TWO || LEVEL == Level.THREE){
-            //here is first step of iterating through objects and fields.
+        if (LEVEL == Level.TWO || LEVEL == Level.THREE) {
+            // here is first step of iterating through objects and fields.
             for (String className : this.objClasses) {
                 List<ReferenceType> referTypes = vm.classesByName(className);
                 if (!referTypes.isEmpty()) {
@@ -123,31 +157,45 @@ public class VMInfo {
                     this.targetJClasses.put(className, jclass);
                 }
             }
-            
+
         }
     }
 
-    public void printConditions() {
-        // for(Condition con: outputConditions){
-        for (int i = outputConditions.size()-1; i >= 0; i--) {
+    public void printConditions(ProgramPoint stopPoint) throws IOException {
+        String conStr = "";
+        if (stopPoint instanceof MethodPoint)
+            conStr = "@@," + ((MethodPoint) stopPoint).toString();
+        else if (stopPoint instanceof LinePoint)
+            conStr = "@@," + ((LinePoint) stopPoint).toString();
+
+        if (this.writer != null) {
+            writer.write(conStr);
+            writer.newLine();
+        } else
+            printMessage(conStr);
+
+        for (int i = outputConditions.size() - 1; i >= 0; i--) {
             Condition con = outputConditions.get(i);
             if (con instanceof ElementNumberCondition) {
-                printMessage(((ElementNumberCondition) con).toString());
+                conStr = ((ElementNumberCondition) con).toString();
             } else if (con instanceof FieldValueCondition) {
-                printMessage(((FieldValueCondition) con).toString());
+                conStr = ((FieldValueCondition) con).toString();
             } else if (con instanceof MethodExistCondition) {
-                printMessage(((MethodExistCondition) con).toString());
+                conStr = ((MethodExistCondition) con).toString();
             } else if (con instanceof ObjectNumberCondition) {
-                printMessage(((ObjectNumberCondition) con).toString());
+                conStr = ((ObjectNumberCondition) con).toString();
             } else {
-                printMessage("unrecoginzed condition");
+                conStr = "unrecoginzed condition";
             }
+
+            if (this.writer != null) {
+                writer.write(conStr);
+                writer.newLine();
+            } else
+                printMessage(conStr);
         }
     }
 
-    // public void recordConditions(){
-    //
-    // }
     private void printMessage(String message) {
         System.out.println("[vm] message: " + message);
     }

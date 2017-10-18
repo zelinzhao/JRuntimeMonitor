@@ -3,7 +3,7 @@ package collect.runtime.information.condition;
 import collect.runtime.information.value.JValue;
 
 public class FieldValueCondition extends Condition{
-    private static final String type = "VALUE";
+    public static final String type = "VALUE";
     private JValue jvalue;
     
     /**

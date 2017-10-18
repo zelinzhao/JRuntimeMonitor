@@ -10,7 +10,7 @@ import com.sun.jdi.Method;
  * 
  */
 public class MethodExistCondition extends Condition{
-    private static final String type = "EXIST";
+    public static final String type = "EXIST";
     private Method method;
     
     /**

@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.StringTokenizer;
 
+import com.sun.jdi.event.BreakpointEvent;
+
 public class VMCmds{
     /**
      * full class name
@@ -17,9 +19,7 @@ public class VMCmds{
         this.stopCmds = stopCmds;
     }
     
-    public VMCmds() {
-        // TODO Auto-generated constructor stub
-    }
+    public VMCmds() { }
 
     public void addCmd(ProgramPoint pp){
         String className = pp.getFullClassName();
@@ -45,6 +45,22 @@ public class VMCmds{
 
     public List<ProgramPoint> getStopCmdsByClass(String classname) {
         return this.stopCmds.get(classname);
+    }
+    
+    public ProgramPoint getStopCmdsByEvent(BreakpointEvent breakevent){
+        String locClass = breakevent.location().declaringType().name();
+        String locMetName = breakevent.location().method().name();
+        String locMetDesc = breakevent.location().method().signature();
+        int lineNo = breakevent.location().lineNumber();
+        
+        if(!this.stopCmds.containsKey(locClass))
+            return null;
+        for(ProgramPoint pp: this.stopCmds.get(locClass))
+            if( ( pp instanceof MethodPoint ) && ((MethodPoint)pp).equals(locClass, locMetName, locMetDesc, lineNo))
+                return pp;
+            else if( (pp instanceof LinePoint) && ((LinePoint)pp).equals(locClass, lineNo))
+                return pp;
+        return null;
     }
     
     @Override
