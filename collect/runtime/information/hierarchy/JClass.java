@@ -18,39 +18,17 @@ import collect.runtime.information.value.JObjectValue;
 public class JClass extends Base {
     /** field name and jfield */
     private HashMap<String, JField> fields = new HashMap<String, JField>();
-    /** method name and jmethods */
-    @Deprecated
-    private HashMap<String, JMethod> methods = new HashMap<String, JMethod>();
-    /** constructor name and constructors (use jmethod) */
-    @Deprecated
-    private HashMap<String, JMethod> constructors = new HashMap<String, JMethod>();
 
     /** object name and ObjectReference, may not be needed */
     private HashMap<Long, JObjectValue> instances = new HashMap<Long, JObjectValue>();
 
-    public JClass(Type type, String typename, String name) {
-        super(type, typename, name);
-        // TODO Auto-generated constructor stub
-    }
-
     /**
-     * 
-     * @param type,
-     *            cannot be null
-     * @param name
-     */
-    public JClass(Type type, String name) {
-        this(type, type.name(), name);
-    }
-
-    /**
-     * 
      * @param type
      * @param fieldName, while creating a new object from scratch, there isn't fieldName, should use "" or null.
      * @param eventThread
      */
     public JClass(ReferenceType type, String fieldName, ThreadReference eventThread) {
-        this(type, type.name(), fieldName);
+        super(type, type.name(),fieldName);
         // get all fields of this class
         try {
             for (Field field : type.visibleFields())
@@ -64,6 +42,14 @@ public class JClass extends Base {
             jov.createObject();
             this.instances.put(objRefer.uniqueID(), jov);
         }
+    }
+
+    /**
+     * for input creation.
+     * @param className
+     */
+    public JClass(String className){
+        super(null, className, null);
     }
 
 //    public void extractObjsConditions() {

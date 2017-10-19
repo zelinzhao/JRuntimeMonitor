@@ -21,10 +21,11 @@ public class JLongValue extends JValue {
         this.topLevelObjId = jvalue.topLevelObjId;
     }
 
-    public JLongValue(long real) {
+    public JLongValue(long real, boolean isWrapper) {
         super();
         this.longv = null;
         this.real = real;
+        this.isWrapper = isWrapper;
     }
 
     public long getRealValue() {
@@ -43,7 +44,8 @@ public class JLongValue extends JValue {
 
     @Override
     protected boolean create() {
-        JField jf = new JField(this.longv.type(), this.longv.type().name(), this.name, this.currentfield);
+        String classname = (this.isWrapper ? java.lang.Long.class.getName() : this.longv.type().name());
+        JField jf = new JField(this.longv.type(), classname, this.name, this.currentfield);
         this.fieldPath.addFieldToPath(jf);
         if(this.meetFieldDepth())
             return false;

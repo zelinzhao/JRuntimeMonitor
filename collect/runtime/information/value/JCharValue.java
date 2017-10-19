@@ -22,10 +22,11 @@ public class JCharValue extends JValue {
         this.topLevelObjId = jvalue.topLevelObjId;
     }
 
-    public JCharValue(char real) {
+    public JCharValue(char real, boolean isWrapper) {
         super();
         this.charv = null;
         this.real = real;
+        this.isWrapper = isWrapper;
     }
 
     public char getRealValue() {
@@ -44,7 +45,8 @@ public class JCharValue extends JValue {
 
     @Override
     protected boolean create() {
-        JField jf = new JField(this.charv.type(), this.charv.type().name(), this.name, this.currentfield);
+        String classname = (this.isWrapper ? java.lang.Character.class.getName() : this.charv.type().name());
+        JField jf = new JField(this.charv.type(), classname , this.name, this.currentfield);
         this.fieldPath.addFieldToPath(jf);
         if(this.meetFieldDepth())
             return false;

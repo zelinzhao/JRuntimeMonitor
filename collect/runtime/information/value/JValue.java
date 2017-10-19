@@ -52,12 +52,14 @@ public abstract class JValue implements JCreateAccept { // JExtractAccept
      * field path to access this object. For top level object, this is empty.
      */
     protected JFieldPath fieldPath = new JFieldPath();
+    
 
     public boolean meetFieldDepth() {
         if (VMInfo.DEPTH == 0 || this.fieldPath.getDepth() <= VMInfo.DEPTH)
             return false;
         return true;
     }
+
     protected Condition condition;
 
     public void setCondition(Condition cond) {
@@ -115,6 +117,9 @@ public abstract class JValue implements JCreateAccept { // JExtractAccept
     public JFieldPath getFieldPath() {
         return fieldPath;
     }
+    public void setFieldPath(JFieldPath jfp){
+        this.fieldPath = jfp;
+    }
 
     public long getTopLevelObjId() {
         return this.topLevelObjId;
@@ -151,6 +156,66 @@ public abstract class JValue implements JCreateAccept { // JExtractAccept
      *         if is primitive type object.
      */
     public abstract String getRealValueAsString();
+
+    /**
+     * for input creation.
+     * 
+     * @param typename
+     *            primitive or reference type, full class name.
+     * @param real
+     *            for primitive value, turn {@code real} to corresponding type
+     *            value. Pay attention to char type value, only passing the
+     *            real[0] to char value. for reference type value, {@code real}
+     *            is NULL/NOT_NULL
+     * @return JValue
+     */
+    public static JValue createValueFromInput(String typename, String real) {
+        if (typename.equals(java.lang.String.class.getName()))
+            // string object
+            return new JStringValue(real);
+        else if (typename.equals(java.lang.Boolean.class.getName()))
+            // Boolean wrapper
+            return new JBooleanValue(Boolean.valueOf(real), true);
+        else if (typename.equals("boolean"))
+            return new JBooleanValue(Boolean.valueOf(real), false);
+        else if (typename.equals(java.lang.Byte.class.getName()))
+            // Byte wrapper
+            return new JByteValue(Byte.valueOf(real), true);
+        else if (typename.equals("byte"))
+            return new JByteValue(Byte.valueOf(real), false);
+        else if (typename.equals(java.lang.Character.class.getName()))
+            // Char wrapper
+            return new JCharValue(real.charAt(0), true);
+        else if(typename.equals("char"))
+            return new JCharValue(real.charAt(0), false);
+        else if (typename.equals(java.lang.Double.class.getName()))
+            // Double wrapper
+            return new JDoubleValue(Double.valueOf(real), true);
+        else if(typename.equals("double"))
+            return new JDoubleValue(Double.valueOf(real), false);
+        else if (typename.equals(java.lang.Float.class.getName()))
+            // Float wrapper
+            return new JFloatValue(Float.valueOf(real), true);
+        else if(typename.equals("float"))
+            return new JFloatValue(Float.valueOf(real), false);
+        else if (typename.equals(java.lang.Integer.class.getName()))
+            // Integer wrapper
+            return new JIntegerValue(Integer.valueOf(real), true);
+        else if(typename.equals("int"))
+            return new JIntegerValue(Integer.valueOf(real), false);
+        else if (typename.equals(java.lang.Long.class.getName()))
+            // Long wrapper
+            return new JLongValue(Long.valueOf(real),true);
+        else if(typename.equals("long"))
+            return new JLongValue(Long.valueOf(real),false);
+        else if (typename.equals(java.lang.Short.class.getName()))
+            // short value
+            return new JShortValue(Short.valueOf(real), true);
+        else if(typename.equals("short"))
+            return new JShortValue(Short.valueOf(real), false);
+        else
+            return new JObjectValue(real);
+    }
 
     /**
      * 
@@ -214,7 +279,6 @@ public abstract class JValue implements JCreateAccept { // JExtractAccept
             ObjectReference objectReference = (ObjectReference) fieldValue;
             ReferenceType referencetype = (ReferenceType) fieldType;
             String typename = fieldType.name();
-
             if (referencetype instanceof ArrayType) {
                 ArrayReference arrayvalue = (ArrayReference) objectReference;
                 JArrayValue jav = new JArrayValue(arrayvalue, fieldName, currentField, fatherObj);

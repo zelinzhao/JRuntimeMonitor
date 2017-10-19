@@ -22,10 +22,11 @@ public class JDoubleValue extends JValue {
         this.topLevelObjId = jvalue.topLevelObjId;
     }
 
-    public JDoubleValue(double real) {
+    public JDoubleValue(double real, boolean isWrapper) {
         super();
         this.doublev = null;
         this.real = real;
+        this.isWrapper = isWrapper;
     }
 
     public double getRealValue() {
@@ -44,7 +45,8 @@ public class JDoubleValue extends JValue {
 
     @Override
     protected boolean create() {
-        JField jf = new JField(this.doublev.type(), this.doublev.type().name(), this.name, this.currentfield);
+        String classname = (this.isWrapper ? java.lang.Double.class.getName() : this.doublev.type().name());
+        JField jf = new JField(this.doublev.type(), classname, this.name, this.currentfield);
         this.fieldPath.addFieldToPath(jf);
         if(this.meetFieldDepth())
             return false;

@@ -22,10 +22,11 @@ public class JFloatValue extends JValue {
         this.topLevelObjId = jvalue.topLevelObjId;
     }
 
-    public JFloatValue(float real) {
+    public JFloatValue(float real, boolean isWrapper) {
         super();
         this.floatv = null;
         this.real = real;
+        this.isWrapper = isWrapper;
     }
 
     public float getRealValue() {
@@ -44,7 +45,8 @@ public class JFloatValue extends JValue {
 
     @Override
     protected boolean create() {
-        JField jf = new JField(this.floatv.type(), this.floatv.type().name(), this.name, this.currentfield);
+        String classname = (this.isWrapper ? java.lang.Float.class.getName() : this.floatv.type().name());
+        JField jf = new JField(this.floatv.type(), classname, this.name, this.currentfield);
         this.fieldPath.addFieldToPath(jf);
         if(this.meetFieldDepth())
             return false;

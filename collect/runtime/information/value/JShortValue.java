@@ -21,10 +21,11 @@ public class JShortValue extends JValue {
         this.topLevelObjId = jvalue.topLevelObjId;
     }
 
-    public JShortValue(short real) {
+    public JShortValue(short real, boolean isWrapper) {
         super();
         this.shortv = null;
         this.real = real;
+        this.isWrapper = isWrapper;
     }
 
     public short getRealValue() {
@@ -43,7 +44,8 @@ public class JShortValue extends JValue {
 
     @Override
     protected boolean create() {
-        JField jf = new JField(this.shortv.type(), this.shortv.type().name(), this.name, this.currentfield);
+        String classname = (this.isWrapper ? java.lang.Short.class.getName() : this.shortv.type().name());
+        JField jf = new JField(this.shortv.type(), classname, this.name, this.currentfield);
         this.fieldPath.addFieldToPath(jf);
         if(this.meetFieldDepth())
             return false;

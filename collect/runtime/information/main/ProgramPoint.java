@@ -100,19 +100,20 @@ public class ProgramPoint {
     @Override
     public String toString() {
         if (this.loc == PointLoc.ENTER)
-            return this.fullClassName + "-" + this.methodName + "-" + this.methodDesc + ":enter";
+            return "@@,"+this.fullClassName + "-" + this.methodName + "-" + this.methodDesc + ":enter";
         else if (this.loc == PointLoc.EXIT)
-            return this.fullClassName + "-" + this.methodName + "-" + this.methodDesc + ":exit";
+            return "@@,"+this.fullClassName + "-" + this.methodName + "-" + this.methodDesc + ":exit";
         else if (this.loc == PointLoc.LINE)
-            return this.fullClassName + ":" + this.lineNo;
+            return "@@,"+this.fullClassName + ":" + this.lineNo;
         else
             return null;
 
     }
 
     /**
-     * Comparing to another program point, which PointLoc should be clear.
-     * This method does Not compare the line number if they are method point.
+     * Comparing to another program point, which {@code PointLoc} should be clear.
+     * This method does Not compare the line number if they are method point, because 
+     * when reading point and conditions from file, the line number is not known.
      */
     @Override
     public boolean equals(Object obj) {

@@ -26,6 +26,8 @@ public class JObjectValue extends JValue {
     private ReferenceType type;
     private HashMap<String, JValue> fieldValues = new HashMap<String, JValue>();
     private HashMap<String, JValue> staticFieldValues = new HashMap<String, JValue>();
+    
+    String real = NOT_NULL;
 
     /**
      * Be careful with this constructor.
@@ -44,6 +46,10 @@ public class JObjectValue extends JValue {
         if (field == null) {
             this.topLevelObjId = value.uniqueID();
         }
+    }
+    
+    public JObjectValue(String real){
+        this.real = real;
     }
 
     public JObjectValue(String name, ObjectReference object, Field currentfield, JValue jvalue) {
@@ -103,7 +109,7 @@ public class JObjectValue extends JValue {
 
     @Override
     public String getRealValueAsString() {
-        return NOT_NULL;
+        return this.real;
     }
 
     protected boolean create() {

@@ -5,7 +5,38 @@ import collect.runtime.information.main.ProgramPoint;
 enum Operator{
     EXIST, NOT_EXIST, 
     EQUAL, NOT_EQUAL,
-    LESS_THAN, GREATER_THAN
+    LESS_THAN, GREATER_THAN;
+    
+    private static final String exist = "++";
+    private static final String not_exist = "--";
+    private static final String equal = "==";
+    private static final String not_equal = "!=";
+    private static final String less_than = "<<";
+    private static final String greater_than = ">>";
+    
+    public static Operator getOperator (String oper){
+        switch (oper){
+            case exist: return EXIST;
+            case not_exist: return NOT_EXIST;
+            case equal: return EQUAL;
+            case not_equal: return NOT_EQUAL;
+            case less_than: return LESS_THAN;
+            case greater_than: return GREATER_THAN;
+            default: return null;
+        }
+    }
+    @Override
+    public String toString(){
+        switch (this){
+            case EXIST: return exist;
+            case NOT_EXIST: return not_exist;
+            case EQUAL: return equal;
+            case NOT_EQUAL: return not_equal;
+            case LESS_THAN: return less_than;
+            case GREATER_THAN: return greater_than;
+            default: return "??";
+        }
+    }
 }
 
 /**
@@ -66,14 +97,6 @@ public abstract class Condition {
     
     @Override
     public String toString(){
-        switch (oper){
-        case EXIST:         return "++"; 
-        case NOT_EXIST:     return "--"; 
-        case EQUAL:         return "=="; 
-        case NOT_EQUAL:     return "!="; 
-        case LESS_THAN:     return "<<"; 
-        case GREATER_THAN:  return ">>"; 
-        default:            return "??";
-        }
+        return this.oper.toString();
     }
 }

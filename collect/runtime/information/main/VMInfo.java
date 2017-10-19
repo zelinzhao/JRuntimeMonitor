@@ -162,7 +162,7 @@ public class VMInfo {
     }
 
     public void printConditions(ProgramPoint stopPoint) throws IOException {
-        String conStr = "@@,"+ stopPoint.toString();
+        String conStr = stopPoint.toString();
 
         if (this.writer != null) {
             writer.write(conStr);

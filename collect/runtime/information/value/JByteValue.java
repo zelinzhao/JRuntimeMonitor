@@ -18,14 +18,14 @@ public class JByteValue extends JValue {
         this.bytev = value;
         this.real = value.byteValue();
         this.fieldPath = jvalue.fieldPath.clone();
-        
         this.topLevelObjId = jvalue.topLevelObjId;
     }
 
-    public JByteValue(byte real) {
+    public JByteValue(byte real, boolean isWrapper) {
         super();
         this.bytev = null;
         this.real = real;
+        this.isWrapper = isWrapper;
     }
 
     public byte getRealValue() {
@@ -44,7 +44,8 @@ public class JByteValue extends JValue {
 
     @Override
     protected boolean create() {
-        JField jf = new JField(this.bytev.type(), this.bytev.type().name(), this.name, this.currentfield);
+        String classname = (this.isWrapper ? java.lang.Byte.class.getName() : this.bytev.type().name());
+        JField jf = new JField(this.bytev.type(), classname , this.name, this.currentfield);
         this.fieldPath.addFieldToPath(jf);
         if(this.meetFieldDepth())
             return false;

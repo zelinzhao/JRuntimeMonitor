@@ -7,26 +7,31 @@ import com.sun.jdi.Type;
 
 public class JMethod extends Base {
     private Method method;
-    private Type returnType;
-    private List<Type> arguments;
+    private String methodDesc;
+//    private Type returnType;
+//    private List<Type> arguments;
 
-    /**
-     * 
-     * @param type, where this method locate
-     * @param typename, where this method locate
-     * @param name, method name
-     */
-    public JMethod(Type type, String typename, String name) {
-        super(type, typename, name);
-        // TODO Auto-generated constructor stub
-    }
     public JMethod(Method method){
         super(method.declaringType(), method.declaringType().name(), method.name());
         this.method = method;
+        this.methodDesc = method.signature();
     }
 
+    public JMethod(String className, String methodName, String methodDesc){
+        super(null,className,methodName);
+        this.methodDesc = methodDesc;
+    }
+    
     public JMethod clone() {
         // TODO need to implement clone
         return this;
     }
+    
+    public String getMethodDesc(){
+        return this.methodDesc;
+    }
+    public String getMethodName(){
+        return super.getName();
+    }
+    
 }

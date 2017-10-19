@@ -24,10 +24,11 @@ public class JIntegerValue extends JValue {
         this.topLevelObjId = jvalue.topLevelObjId;
     }
 
-    public JIntegerValue(int real) {
+    public JIntegerValue(int real, boolean isWrapper) {
         super();
         this.integer = null;
         this.real = real;
+        this.isWrapper = isWrapper;
     }
 
     public int getRealValue() {
@@ -47,7 +48,8 @@ public class JIntegerValue extends JValue {
 
     @Override
     protected boolean create() {
-        JField jf = new JField(this.integer.type(), this.integer.type().name(), this.name, this.currentfield);
+        String classname = (this.isWrapper ? java.lang.Integer.class.getName() : this.integer.type().name());
+        JField jf = new JField(this.integer.type(), classname, this.name, this.currentfield);
         this.fieldPath.addFieldToPath(jf);
         if(this.meetFieldDepth())
             return false;

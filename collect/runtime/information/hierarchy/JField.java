@@ -6,9 +6,18 @@ import com.sun.jdi.Type;
 public class JField extends Base {
     private Field field;
 
-    public JField(Type type, String typename, String name, Field field) {
-        super(type, typename, name);
+    public JField(Type type, String className, String name, Field field) {
+        super(type, className, name);
         this.field = field;
+    }
+    
+    /**
+     * for input creation.
+     * @param className
+     * @param name
+     */
+    public JField(String className, String name){
+        super(null, className, name);
     }
 
     public Field getField() {
@@ -17,7 +26,7 @@ public class JField extends Base {
 
     @Override
     public JField clone() {
-        String tn = new String(typename);
+        String tn = new String(className);
         String n = new String(name);
         return new JField(type, tn, n, field);
     }
@@ -26,8 +35,6 @@ public class JField extends Base {
      * @return field name if this field is not null, or return ""
      */
     public String getFieldAsString(){
-//        if(this.name == null || this.name.length()==0)
-//            return THIS_OBJ;
         return this.name;
     }
 }

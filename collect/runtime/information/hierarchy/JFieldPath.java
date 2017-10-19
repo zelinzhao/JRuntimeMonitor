@@ -16,6 +16,23 @@ public class JFieldPath implements Cloneable {
     public JFieldPath(LinkedList<JField> fieldPath) {
         this.fieldPath = fieldPath;
     }
+    
+    /**
+     * for input creation.
+     * @param topLevelClass
+     * @param fieldPath
+     * @param bottomLevelClass
+     */
+    public JFieldPath(String topLevelClass, String fieldPath, String bottomLevelClass){
+        String[] sp = fieldPath.split("\\.");
+        if(sp[0].equals("this")) // top level field's name is null or ""
+            this.fieldPath.add(new JField(topLevelClass, null));
+        for(int i=1; i<sp.length-1; i++)
+            this.fieldPath.add(new JField(null, sp[i]));
+        if(sp.length>=2)
+            this.fieldPath.add(new JField(bottomLevelClass, sp[sp.length-1]));
+    }
+    
 
     public JFieldPath clone() {
         LinkedList<JField> clone = new LinkedList<JField>();
@@ -31,12 +48,12 @@ public class JFieldPath implements Cloneable {
     public String getTopLevelClassName(){
         if(this.fieldPath == null || this.fieldPath.size() == 0)
             return null;
-        return this.fieldPath.get(0).getTypeName();
+        return this.fieldPath.get(0).getClassName();
     }
     public String getBottomLevelClassName(){
         if(this.fieldPath == null || this.fieldPath.size() == 0)
             return null;
-        return this.fieldPath.get(this.fieldPath.size()-1).getTypeName();
+        return this.fieldPath.get(this.fieldPath.size()-1).getClassName();
     }
     
     /**
@@ -63,6 +80,13 @@ public class JFieldPath implements Cloneable {
      */
     public int getDepth(){
         return this.fieldPath.size();
+    }
+    
+    public JField getTopField(){
+        return this.fieldPath.getFirst();
+    }
+    public JField getBottomField(){
+        return this.fieldPath.getLast();
     }
     
     

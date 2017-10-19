@@ -1,6 +1,7 @@
 package collect.runtime.information.condition;
 
 import collect.runtime.information.hierarchy.JClass;
+import collect.runtime.information.main.ProgramPoint;
 
 public class ObjectNumberCondition extends Condition{
     public static final String type = "OBJECT";
@@ -16,12 +17,31 @@ public class ObjectNumberCondition extends Condition{
         this.number = jclass.getInstanceNumber();
         this.oper = Operator.EQUAL;
     }
+
+//   0,   1  ,      2       ,    3
+//  ==,OBJECT, package.class, 0/1/2/...
+//  !=,OBJECT, package.class, 0/1/2/...
+//  <<,OBJECT, package.class, 0/1/2/...
+//  >>,OBJECT, package.class, 0/1/2/...
+    /**
+     * for input condition.
+     * @param pp
+     * @param rawCond
+     */
+    public ObjectNumberCondition(ProgramPoint pp, String rawCond){
+        this.pointID = pp;
+        this.rawCond = rawCond;
+        String[] sp = rawCond.replaceAll("\\s", "").split(",");
+        this.oper = Operator.getOperator(sp[0]);
+        this.jclass = new JClass(sp[2]);
+        this.number = Integer.valueOf(sp[3]);
+    }
     
     @Override 
     public String toString(){
         String result = super.toString()+",";
         result += type+",";
-        result += this.jclass.getTypeName()+",";
+        result += this.jclass.getClassName()+",";
         result += this.number;
         return result;
     }

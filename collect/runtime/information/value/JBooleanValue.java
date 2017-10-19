@@ -21,10 +21,11 @@ public class JBooleanValue extends JValue {
         this.topLevelObjId = jvalue.topLevelObjId;
     }
 
-    public JBooleanValue(boolean real) {
+    public JBooleanValue(boolean real, boolean isWrapper) {
         super();
         this.booleanv = null;
         this.real = real;
+        this.isWrapper = isWrapper;
     }
 
     public boolean getRealValue() {
@@ -43,7 +44,8 @@ public class JBooleanValue extends JValue {
 
     @Override
     protected boolean create() {
-        JField jf = new JField(this.booleanv.type(), this.booleanv.type().name(), this.name, this.currentfield);
+        String classname =(this.isWrapper ? java.lang.Boolean.class.getName() : this.booleanv.type().name());
+        JField jf = new JField(this.booleanv.type(), classname, this.name, this.currentfield);
         this.fieldPath.addFieldToPath(jf);
         if(this.meetFieldDepth())
             return false;
