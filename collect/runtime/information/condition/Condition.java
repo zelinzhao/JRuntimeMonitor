@@ -99,4 +99,13 @@ public abstract class Condition {
     public String toString(){
         return this.oper.toString();
     }
+    
+    @Override
+    public boolean equals(Object cond){
+        if(cond == null || !(cond instanceof Condition))
+            return false;
+        if(this.oper != ((Condition)cond).oper)
+            return false;
+        return true;
+    }
 }

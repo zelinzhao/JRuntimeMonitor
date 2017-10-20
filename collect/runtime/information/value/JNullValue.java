@@ -21,6 +21,7 @@ public class JNullValue extends JValue {
             this.fieldPath = jvalue.fieldPath.clone();
             this.topLevelObjId = jvalue.topLevelObjId;
         }
+        this.realAsString = JValue.NULL;
     }
 
 //    @Override
@@ -64,10 +65,6 @@ public class JNullValue extends JValue {
     @Override
     public Value getVmValue() {
         return null;
-    }
-    @Override
-    public String getRealValueAsString(){
-        return NULL;
     }
 
 }

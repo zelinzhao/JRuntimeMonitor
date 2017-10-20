@@ -18,8 +18,8 @@ public class JCharValue extends JValue {
         this.charv = value;
         this.real = value.charValue();
         this.fieldPath = jvalue.fieldPath.clone();
-        
         this.topLevelObjId = jvalue.topLevelObjId;
+        this.realAsString = String.valueOf(real);
     }
 
     public JCharValue(char real, boolean isWrapper) {
@@ -27,6 +27,7 @@ public class JCharValue extends JValue {
         this.charv = null;
         this.real = real;
         this.isWrapper = isWrapper;
+        this.realAsString = String.valueOf(real);
     }
 
     public char getRealValue() {
@@ -63,8 +64,4 @@ public class JCharValue extends JValue {
         return this.charv;
     }
     
-    @Override
-    public String getRealValueAsString(){
-        return String.valueOf(real);
-    }
 }

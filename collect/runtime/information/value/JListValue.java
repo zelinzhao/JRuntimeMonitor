@@ -52,8 +52,8 @@ public class JListValue extends JValue {
         this.object = array;
         this.alreadyObj = jvalue.alreadyObj;
         this.fieldPath = jvalue.fieldPath.clone();
-        
         this.topLevelObjId = jvalue.topLevelObjId;
+        this.realAsString = JValue.NOT_NULL;
     }
 
     public Type getComponentType() {
@@ -160,9 +160,5 @@ public class JListValue extends JValue {
     @Override
     public Value getVmValue() {
         return this.object;
-    }
-    @Override
-    public String getRealValueAsString(){
-        return NOT_NULL;
     }
 }

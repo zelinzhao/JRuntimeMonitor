@@ -136,6 +136,22 @@ public class ProgramPoint {
             return false;
         return true;
     }
+    @Override
+    public int hashCode(){
+        switch (loc){
+            case ENTER:{
+                return (this.fullClassName+this.methodName+this.methodDesc+this.loc).hashCode();
+            }case EXIT:{
+                return (this.fullClassName+this.methodName+this.methodDesc+this.loc).hashCode();
+            }case LINE:{
+                return (this.fullClassName+this.lineNo+this.loc).hashCode();
+            }case OTHER:{
+                return this.loc.hashCode();
+            }default:{
+                return 0;
+            }
+        }
+    }
 
     /**
      * 

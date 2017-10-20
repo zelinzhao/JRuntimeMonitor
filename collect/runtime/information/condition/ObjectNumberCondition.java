@@ -45,4 +45,18 @@ public class ObjectNumberCondition extends Condition{
         result += this.number;
         return result;
     }
+    
+    @Override
+    public boolean equals(Object cond){
+        if(!super.equals(cond))
+            return false;
+        ObjectNumberCondition onc = (ObjectNumberCondition)cond;
+        if(this.number!= onc.number)
+            return false;
+        return this.jclass.equals(onc.jclass);
+    }
+    @Override
+    public int hashCode(){
+        return this.oper.hashCode()+this.jclass.hashCode()+this.number;
+    }
 }

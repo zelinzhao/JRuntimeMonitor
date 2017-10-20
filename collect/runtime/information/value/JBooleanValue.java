@@ -17,8 +17,8 @@ public class JBooleanValue extends JValue {
         this.booleanv = value;
         this.real = value.booleanValue();
         this.fieldPath = jvalue.fieldPath.clone();
-        
         this.topLevelObjId = jvalue.topLevelObjId;
+        this.realAsString = String.valueOf(real);
     }
 
     public JBooleanValue(boolean real, boolean isWrapper) {
@@ -26,6 +26,7 @@ public class JBooleanValue extends JValue {
         this.booleanv = null;
         this.real = real;
         this.isWrapper = isWrapper;
+        this.realAsString = String.valueOf(real);
     }
 
     public boolean getRealValue() {
@@ -60,9 +61,5 @@ public class JBooleanValue extends JValue {
     @Override
     public Value getVmValue() {
         return this.booleanv;
-    }
-    @Override
-    public String getRealValueAsString(){
-        return String.valueOf(real);
     }
 }

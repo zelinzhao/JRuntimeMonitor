@@ -17,26 +17,14 @@ import collect.runtime.information.main.ProgramPoint;
 
 public class ReadConditions {
 
-    private String inputFile = "E:\\Eclipse\\conditions.txt";
-    private BufferedReader reader ;
-
-    public void setInputFile(String inputFile) {
-        this.inputFile = inputFile;
-        try {
-            this.reader = new BufferedReader(new FileReader(this.inputFile));
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void readConditions() throws IOException {
+    public static HashMap<ProgramPoint, List<Condition>> readConditions(String inputFile) throws IOException {
+        BufferedReader reader = new BufferedReader(new FileReader(inputFile));
         HashMap<ProgramPoint, List<Condition>> pointConditions = new HashMap<ProgramPoint, List<Condition>>();
         
         ProgramPoint currentPoint =null;
         List<Condition> currentConditions = new ArrayList<Condition>();
         
         String temp = reader.readLine();
-        String get = "";
         while (temp != null) {
             System.out.println("read: "+temp);
             //clear all whitespace
@@ -59,29 +47,21 @@ public class ReadConditions {
                         case ElementNumberCondition.type:{
                             ElementNumberCondition enc = new ElementNumberCondition(currentPoint, temp);
                             currentConditions.add(enc);
-                            System.out.println("get:  " + enc.toString());
-                            get = enc.toString();
                             break;
                         }
                         case FieldValueCondition.type:{
                             FieldValueCondition fvc = new FieldValueCondition(currentPoint,temp);
                             currentConditions.add(fvc);
-                            System.out.println("get:  " + fvc.toString());
-                            get = fvc.toString();
                             break;
                         }
                         case MethodExistCondition.type:{
                             MethodExistCondition mec = new MethodExistCondition(currentPoint, temp);
                             currentConditions.add(mec);
-                            System.out.println("get:  " + mec.toString());
-                            get = mec.toString();
                             break;
                         }
                         case ObjectNumberCondition.type:{
                             ObjectNumberCondition onc = new ObjectNumberCondition(currentPoint, temp);
                             currentConditions.add(onc);
-                            System.out.println("get:  " + onc.toString());
-                            get = onc.toString();
                             break;
                         }
                         default:{
@@ -95,16 +75,17 @@ public class ReadConditions {
             temp = reader.readLine();
         }
         reader.close();
+        return pointConditions;
     }
-    public static void main(String[] args){
-        try {
-            ReadConditions rc = new ReadConditions();
-            rc.reader = new BufferedReader(new FileReader(rc.inputFile));
-            rc.readConditions();
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-    }
+//    public static void main(String[] args){
+//        try {
+//            ReadConditions rc = new ReadConditions();
+//            rc.reader = new BufferedReader(new FileReader(rc.inputFile));
+//            rc.readConditions();
+//        } catch (IOException e) {
+//            // TODO Auto-generated catch block
+//            e.printStackTrace();
+//        }
+//    }
 
 }

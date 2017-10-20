@@ -17,14 +17,15 @@ public class JStringValue extends JValue {
         this.string = string;
         this.real = string.value();
         this.fieldPath = jvalue.fieldPath.clone();
-        
         this.topLevelObjId = jvalue.topLevelObjId;
+        this.realAsString = String.valueOf(real);
     }
 
     public JStringValue(String real) {
         super();
         this.string = null;
         this.real = real;
+        this.realAsString = String.valueOf(real);
     }
 
     public String getRealValue() {
@@ -57,9 +58,5 @@ public class JStringValue extends JValue {
     @Override
     public Value getVmValue() {
         return this.string;
-    }
-    @Override
-    public String getRealValueAsString(){
-        return this.real;
     }
 }

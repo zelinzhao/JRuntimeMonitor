@@ -64,4 +64,15 @@ public class JClass extends Base {
     public JClass clone() {
         return this;
     }
+    
+    @Override
+    public boolean equals(Object obj){
+        if(obj==null || !(obj instanceof JClass))
+            return false;
+        return this.className.equals(((JClass)obj).className);
+    }
+    @Override
+    public int hashCode(){
+        return this.className.hashCode();
+    }
 }

@@ -52,4 +52,28 @@ public class ElementNumberCondition extends Condition{
         result += this.number;
         return result;
     }
+    
+    /**
+     * comparing the number, 
+     * comparing the fieldpath (i.e., top level's classname, bottom level's class and fieldname)
+     * @param cond
+     * @return
+     */
+    @Override 
+    public boolean equals(Object cond){
+        if(!super.equals(cond))
+            return false;
+        if(cond == null || !(cond instanceof ElementNumberCondition))
+            return false;
+        ElementNumberCondition enc = (ElementNumberCondition) cond;
+        if(this.number!= enc.number)
+            return false;
+        //for this condition, we only need to compare the field path.
+        //the JValue.equals method also compares the real value.
+        return this.jvalue.getFieldPath().equals(enc.jvalue.getFieldPath());
+    }
+    @Override
+    public int hashCode(){
+        return this.oper.hashCode()+this.jvalue.getFieldPath().hashCode()+this.number;
+    }
 }

@@ -54,4 +54,15 @@ public class MethodExistCondition extends Condition{
         result += this.jmethod.getMethodDesc();
         return result;
     }
+    
+    @Override
+    public boolean equals(Object cond){
+        if(!super.equals(cond))
+            return false;
+        return this.jmethod.equals(((MethodExistCondition)cond).jmethod);
+    }
+    @Override
+    public int hashCode(){
+        return this.oper.hashCode()+this.jmethod.hashCode();
+    }
 }

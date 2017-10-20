@@ -52,7 +52,13 @@ public abstract class JValue implements JCreateAccept { // JExtractAccept
      * field path to access this object. For top level object, this is empty.
      */
     protected JFieldPath fieldPath = new JFieldPath();
-    
+    /**
+     * the string representation of the real value. 
+     * For primitive value, use String.valueOf();
+     * For reference type value, use NULL/NOT_NULL
+     * Default is null, must be initialized while creating a JValue, no matter from input or running-sub-vm;
+     */
+    protected String realAsString = null;
 
     public boolean meetFieldDepth() {
         if (VMInfo.DEPTH == 0 || this.fieldPath.getDepth() <= VMInfo.DEPTH)
@@ -148,6 +154,22 @@ public abstract class JValue implements JCreateAccept { // JExtractAccept
     }
 
     public abstract Value getVmValue();
+    
+    @Override 
+    public boolean equals(Object obj){
+        if(obj==null)
+            return false;
+        if( !(obj instanceof JValue) )
+            return false;
+        if (!this.fieldPath.equals( ((JValue)obj).fieldPath))
+            return false;
+        return this.realAsString.equals(((JValue)obj).realAsString);
+    }
+    
+    @Override
+    public int hashCode(){
+        return this.fieldPath.hashCode()+this.realAsString.hashCode();
+    }
 
     /**
      * For output conditions.
@@ -155,11 +177,16 @@ public abstract class JValue implements JCreateAccept { // JExtractAccept
      * @return null/not_null if is reference type object, real value as string
      *         if is primitive type object.
      */
-    public abstract String getRealValueAsString();
+    public String getRealValueAsString(){
+        return this.realAsString;
+    }
 
     /**
      * for input creation.
-     * 
+     * While creating from input, primitive and their wrappers, String are created using corresponding JXxxxValue;
+     * For reference objects, all are created use JOBjectValue. Because when comparing two JValues, we only need the 
+     * fieldPath and the real value (as string). The fieldPath records bottom types and fields name. 
+     * The input creation process is different with running sub-vm creation process.
      * @param typename
      *            primitive or reference type, full class name.
      * @param real
@@ -218,7 +245,7 @@ public abstract class JValue implements JCreateAccept { // JExtractAccept
     }
 
     /**
-     * 
+     * Running sub-vm creation.
      * @param currentField
      * @param fieldName
      *            while this is an element of array,list,map,set, fieldName is
@@ -379,171 +406,4 @@ public abstract class JValue implements JCreateAccept { // JExtractAccept
         System.out.println("Unsupported type " + fieldType.name());
         return null;
     }
-
-    // protected static JValue createPrimitive(Value value, String name, JValue
-    // jvalue) {
-    // if (value instanceof BooleanValue) {
-    // BooleanValue booleanv = (BooleanValue) value;
-    // JBooleanValue jbv = new JBooleanValue(booleanv, name, jvalue);
-    // jbv.acceptCreate(createVisitor);
-    // return jbv;
-    // } else if (value instanceof ByteValue) {
-    // ByteValue bytev = (ByteValue) value;
-    // JByteValue jbv = new JByteValue(bytev, name, jvalue);
-    // jbv.acceptCreate(createVisitor);
-    // return jbv;
-    // } else if (value instanceof CharValue) {
-    // CharValue charv = (CharValue) value;
-    // JCharValue jcv = new JCharValue(charv, name, jvalue);
-    // jcv.acceptCreate(createVisitor);
-    // return jcv;
-    // } else if (value instanceof DoubleValue) {
-    // DoubleValue doublev = (DoubleValue) value;
-    // JDoubleValue jdv = new JDoubleValue(doublev, name, jvalue);
-    // jdv.acceptCreate(createVisitor);
-    // return jdv;
-    // } else if (value instanceof FloatValue) {
-    // FloatValue floatv = (FloatValue) value;
-    // JFloatValue jfv = new JFloatValue(floatv, name, jvalue);
-    // jfv.acceptCreate(createVisitor);
-    // return jfv;
-    // } else if (value instanceof IntegerValue) {
-    // IntegerValue integervalue = (IntegerValue) value;
-    // JIntegerValue jiv = new JIntegerValue(integervalue, name, jvalue);
-    // jiv.acceptCreate(createVisitor);
-    // return jiv;
-    // } else if (value instanceof LongValue) {
-    // LongValue longv = (LongValue) value;
-    // JLongValue jlv = new JLongValue(longv, name, jvalue);
-    // jlv.acceptCreate(createVisitor);
-    // return jlv;
-    // } else if (value instanceof ShortValue) {
-    // ShortValue shortv = (ShortValue) value;
-    // JShortValue jsv = new JShortValue(shortv, name, jvalue);
-    // jsv.acceptCreate(createVisitor);
-    // return jsv;
-    // }
-    // System.out.println("Unsupported type " + value.type().name());
-    // return null;
-    // }
-    //
-    // protected static JValue createReference(Type type, Value value, String
-    // name, Field currentfield, JValue jvalue) {
-    // if (value == null) {
-    // JNullValue jnv = new JNullValue(type, name, jvalue);
-    // return jnv;
-    // }
-    // ObjectReference objectReference = (ObjectReference) value;
-    // ReferenceType referencetype = (ReferenceType) type;
-    // String typename = type.name();
-    //
-    // // array type object
-    // if (referencetype instanceof ArrayType) {
-    // ArrayReference arrayvalue = (ArrayReference) objectReference;
-    // JArrayValue jav = new JArrayValue(arrayvalue, name, currentfield,
-    // jvalue);
-    // jav.acceptCreate(createVisitor);
-    // return jav;
-    // } else if (typename.equals(java.lang.String.class.getName())) {
-    // // string object
-    // StringReference stringvalue = (StringReference) objectReference;
-    // JStringValue jsv = new JStringValue(stringvalue, currentfield, jvalue);
-    // jsv.acceptCreate(createVisitor);
-    // return jsv;
-    // } else if (typename.equals(java.lang.Boolean.class.getName())) {
-    // // Boolean wrapper
-    // Field field = referencetype.fieldByName("value");
-    // BooleanValue fieldvalue = (BooleanValue) objectReference.getValue(field);
-    // JBooleanValue jbv = new JBooleanValue(fieldvalue, name, jvalue);
-    // jbv.isWrapper = true;
-    // jbv.acceptCreate(createVisitor);
-    // return jbv;
-    // } else if (typename.equals(java.lang.Byte.class.getName())) {
-    // // Byte wrapper
-    // Field field = referencetype.fieldByName("value");
-    // ByteValue fieldvalue = (ByteValue) objectReference.getValue(field);
-    // JByteValue jbv = new JByteValue(fieldvalue, name, jvalue);
-    // jbv.isWrapper = true;
-    // jbv.acceptCreate(createVisitor);
-    // return jbv;
-    // } else if (typename.equals(java.lang.Character.class.getName())) {
-    // // Char wrapper
-    // Field field = referencetype.fieldByName("value");
-    // CharValue fieldvalue = (CharValue) objectReference.getValue(field);
-    // JCharValue jcv = new JCharValue(fieldvalue, name, jvalue);
-    // jcv.isWrapper = true;
-    // jcv.acceptCreate(createVisitor);
-    // return jcv;
-    // } else if (typename.equals(java.lang.Double.class.getName())) {
-    // // Double wrapper
-    // Field field = referencetype.fieldByName("value");
-    // DoubleValue fieldvalue = (DoubleValue) objectReference.getValue(field);
-    // JDoubleValue jdv = new JDoubleValue(fieldvalue, name, jvalue);
-    // jdv.isWrapper = true;
-    // jdv.acceptCreate(createVisitor);
-    // return jdv;
-    // } else if (typename.equals(java.lang.Float.class.getName())) {
-    // // Float wrapper
-    // Field field = referencetype.fieldByName("value");
-    // FloatValue fieldvalue = (FloatValue) objectReference.getValue(field);
-    // JFloatValue jfv = new JFloatValue(fieldvalue, name, jvalue);
-    // jfv.isWrapper = true;
-    // jfv.acceptCreate(createVisitor);
-    // return jfv;
-    // } else if (typename.equals(java.lang.Integer.class.getName())) {
-    // // Integer wrapper
-    // Field field = referencetype.fieldByName("value");
-    // IntegerValue fieldvalue = (IntegerValue) objectReference.getValue(field);
-    // JIntegerValue jiv = new JIntegerValue(fieldvalue, name, jvalue);
-    // jiv.isWrapper = true;
-    // jiv.acceptCreate(createVisitor);
-    // return jiv;
-    // } else if (typename.equals(java.lang.Long.class.getName())) {
-    // // Long wrapper
-    // Field field = referencetype.fieldByName("value");
-    // LongValue fieldvalue = (LongValue) objectReference.getValue(field);
-    // JLongValue jlv = new JLongValue(fieldvalue, name, jvalue);
-    // jlv.isWrapper = true;
-    // jlv.acceptCreate(createVisitor);
-    // return jlv;
-    // } else if (typename.equals(java.lang.Short.class.getName())) {
-    // // Short wrapper
-    // Field field = referencetype.fieldByName("value");
-    // ShortValue fieldvalue = (ShortValue) objectReference.getValue(field);
-    // JShortValue jsv = new JShortValue(fieldvalue, name, jvalue);
-    // jsv.isWrapper = true;
-    // jsv.acceptCreate(createVisitor);
-    // return jsv;
-    // } else if (JListValue.isListValue(type)) {
-    // // list object
-    // JListValue jlv = new JListValue(objectReference, name, currentfield,
-    // jvalue);
-    // jlv.acceptCreate(createVisitor);
-    // return jlv;
-    // } else if (JSetValue.isSetValue(type)) {
-    // // set object
-    // JSetValue jsv = new JSetValue(objectReference, name, currentfield,
-    // jvalue);
-    // jsv.acceptCreate(createVisitor);
-    // return jsv;
-    // } else if (JMapValue.isMapValue(type)) {
-    // // map object
-    // JMapValue jmv = new JMapValue(objectReference, name, currentfield,
-    // jvalue);
-    // jmv.acceptCreate(createVisitor);
-    // return jmv;
-    // } else {
-    // // user defined object
-    // JObjectValue jov = new JObjectValue(objectReference, name, currentfield,
-    // jvalue);
-    // jov.acceptCreate(createVisitor);
-    // return jov;
-    // }
-    // // error info: unsupported type
-    // // if (type != null)
-    // // System.out.println("Unsupported type " + type.name());
-    // // else if (value != null)
-    // // System.out.println("Unsupported type " + value.type().name());
-    // // return null;
-    // }
 }

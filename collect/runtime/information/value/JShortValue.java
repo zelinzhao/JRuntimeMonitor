@@ -17,8 +17,8 @@ public class JShortValue extends JValue {
         this.shortv = value;
         this.real = value.shortValue();
         this.fieldPath = jvalue.fieldPath.clone();
-        
         this.topLevelObjId = jvalue.topLevelObjId;
+        this.realAsString = String.valueOf(real);
     }
 
     public JShortValue(short real, boolean isWrapper) {
@@ -26,6 +26,7 @@ public class JShortValue extends JValue {
         this.shortv = null;
         this.real = real;
         this.isWrapper = isWrapper;
+        this.realAsString = String.valueOf(real);
     }
 
     public short getRealValue() {
@@ -60,9 +61,5 @@ public class JShortValue extends JValue {
     @Override
     public Value getVmValue() {
         return this.shortv;
-    }
-    @Override
-    public String getRealValueAsString(){
-        return String.valueOf(real);
     }
 }

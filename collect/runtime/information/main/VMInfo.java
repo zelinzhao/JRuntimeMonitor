@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import com.sun.jdi.IncompatibleThreadStateException;
 import com.sun.jdi.Method;
@@ -24,6 +25,7 @@ import collect.runtime.information.condition.FieldValueCondition;
 import collect.runtime.information.condition.MethodExistCondition;
 import collect.runtime.information.condition.ObjectNumberCondition;
 import collect.runtime.information.hierarchy.JClass;
+import read.runtime.condition.tool.ReadConditions;
 
 enum Level {
     /** only active methods' name. depth always 1. */
@@ -46,7 +48,7 @@ public class VMInfo {
 
     // static fields
     /** for output conditions at stop points */
-    public static List<Condition> outputConditions = new ArrayList<Condition>();
+    public static Set<Condition> outputConditions = new HashSet<Condition>();
     /** for input conditions. point id and conditions */
     public static HashMap<String, List<Condition>> inputConditions = new HashMap<String, List<Condition>>();
     /** default is 1 */
@@ -59,7 +61,7 @@ public class VMInfo {
     private BufferedWriter writer;
     /** reading stop points and corresponding conditions from this file */
     private String inputFile;
-    private BufferedReader reader;
+    private HashMap<ProgramPoint, List<Condition>> pointConditions; 
 
     public void setOutputFile(String outputFile) {
         this.outputFile = outputFile;
@@ -70,11 +72,15 @@ public class VMInfo {
         }
     }
 
+    /**
+     * While setting input file, the stop points and conditions are read from the file immediately in this method.
+     * @param inputFile
+     */
     public void setInputFile(String inputFile) {
         this.inputFile = inputFile;
         try {
-            reader = new BufferedReader(new FileReader(this.inputFile));
-        } catch (FileNotFoundException e) {
+            this.pointConditions = ReadConditions.readConditions(this.inputFile);
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
@@ -170,8 +176,9 @@ public class VMInfo {
         } else
             printMessage(conStr);
 
-        for (int i = outputConditions.size() - 1; i >= 0; i--) {
-            Condition con = outputConditions.get(i);
+//        for (int i = outputConditions.size() - 1; i >= 0; i--) {
+//            Condition con = outputConditions.get(i);
+          for(Condition con: outputConditions){
             if (con instanceof ElementNumberCondition) {
                 conStr = ((ElementNumberCondition) con).toString();
             } else if (con instanceof FieldValueCondition) {

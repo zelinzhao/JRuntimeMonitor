@@ -43,4 +43,18 @@ public class FieldValueCondition extends Condition{
         result+=this.jvalue.getRealValueAsString();
         return result;
     }
+    
+    @Override
+    public boolean equals(Object cond){
+        if (!super.equals(cond))
+            return false;
+        if(cond == null || !(cond instanceof FieldValueCondition))
+            return false;
+        FieldValueCondition fvc = (FieldValueCondition)cond;
+        return this.jvalue.equals(fvc.jvalue);
+    }
+    @Override
+    public int hashCode(){
+        return this.oper.hashCode()+this.jvalue.hashCode();
+    }
 }

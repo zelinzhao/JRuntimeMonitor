@@ -19,6 +19,7 @@ public class JByteValue extends JValue {
         this.real = value.byteValue();
         this.fieldPath = jvalue.fieldPath.clone();
         this.topLevelObjId = jvalue.topLevelObjId;
+        this.realAsString = String.valueOf(real);
     }
 
     public JByteValue(byte real, boolean isWrapper) {
@@ -26,6 +27,7 @@ public class JByteValue extends JValue {
         this.bytev = null;
         this.real = real;
         this.isWrapper = isWrapper;
+        this.realAsString = String.valueOf(real);
     }
 
     public byte getRealValue() {
@@ -60,9 +62,5 @@ public class JByteValue extends JValue {
     @Override
     public Value getVmValue() {
         return this.bytev;
-    }
-    @Override
-    public String getRealValueAsString(){
-        return String.valueOf(real);
     }
 }

@@ -17,8 +17,8 @@ public class JLongValue extends JValue {
         this.longv = value;
         this.real = value.longValue();
         this.fieldPath = jvalue.fieldPath.clone();
-        
         this.topLevelObjId = jvalue.topLevelObjId;
+        this.realAsString = String.valueOf(real);
     }
 
     public JLongValue(long real, boolean isWrapper) {
@@ -26,6 +26,7 @@ public class JLongValue extends JValue {
         this.longv = null;
         this.real = real;
         this.isWrapper = isWrapper;
+        this.realAsString = String.valueOf(real);
     }
 
     public long getRealValue() {
@@ -60,9 +61,5 @@ public class JLongValue extends JValue {
     @Override
     public Value getVmValue() {
         return this.longv;
-    }
-    @Override
-    public String getRealValueAsString(){
-        return String.valueOf(real);
     }
 }

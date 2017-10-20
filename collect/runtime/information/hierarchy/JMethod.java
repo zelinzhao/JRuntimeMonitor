@@ -34,4 +34,22 @@ public class JMethod extends Base {
         return super.getName();
     }
     
+    @Override
+    public boolean equals(Object met){
+        if(met ==null || !(met instanceof JMethod))
+            return false;
+        JMethod jm = (JMethod) met;
+        if(this.className.equals(jm.className) 
+                && this.name.equals(jm.name)
+                && this.methodDesc.equals(jm.methodDesc))
+            return true;
+        return false;
+    }
+    
+    @Override
+    public int hashCode(){
+        return (this.className
+                +this.name
+                +this.methodDesc).hashCode();
+    }
 }

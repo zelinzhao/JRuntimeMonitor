@@ -59,8 +59,8 @@ public class JMapValue extends JValue {
         this.object = array;
         this.alreadyObj = jvalue.alreadyObj;
         this.fieldPath = jvalue.fieldPath.clone();
-        
         this.topLevelObjId = jvalue.topLevelObjId;
+        this.realAsString = JValue.NOT_NULL;
     }
 
     public Type getKeyType() {
@@ -202,10 +202,6 @@ public class JMapValue extends JValue {
     @Override
     public Value getVmValue() {
         return this.object;
-    }
-    @Override
-    public String getRealValueAsString(){
-        return NOT_NULL;
     }
     public int getSize(){
         return this.size;

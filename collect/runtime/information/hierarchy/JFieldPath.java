@@ -75,7 +75,6 @@ public class JFieldPath implements Cloneable {
     }
     
     /**
-     * 
      * @return the depth of current bottom field. Used for controlling depth
      */
     public int getDepth(){
@@ -89,5 +88,42 @@ public class JFieldPath implements Cloneable {
         return this.fieldPath.getLast();
     }
     
+    /**
+     * Two field paths, they are equal if:
+     *  their top level field's classname are equal (top level field doesn't have field name);
+     *  their bottom level field's classname, fieldname are equal;
+     *  other fields' name between top and bottom levels are all equal 
+     *  (these fields don't have type name if they are created by input data);
+     *  If there are array, list, set, their index are ignored.
+     *  If there are map, their index are ignored, only consider it's a value or key.
+     */
+    @Override
+    public boolean equals(Object obj){
+        if(obj == null || !(obj instanceof JFieldPath))
+            return false;
+        JFieldPath jfp = (JFieldPath)obj;
+        //field depth
+        if(this.fieldPath.size() != jfp.fieldPath.size())
+            return false;
+        //top level class name
+        if(!this.getTopLevelClassName().equals(jfp.getTopLevelClassName()))
+            return false;
+        //bottom level class and field names
+        if( !this.fieldPath.getLast().getName().equals(jfp.fieldPath.getLast().getName()) 
+                || !this.fieldPath.getLast().getClassName().equals(jfp.fieldPath.getLast().getClassName()))
+            return false;
+        //other fields' name
+        for(int i=1; i<this.fieldPath.size()-1; i++){
+            if(!this.fieldPath.get(i).compareFieldName(jfp.fieldPath.get(i)))
+                return false;
+        }
+        return true;
+    }
     
+    @Override
+    public int hashCode(){
+        return (this.getTopLevelClassName()
+                +this.getFieldPathAsString()
+                +this.getBottomLevelClassName()).hashCode();
+    }
 }

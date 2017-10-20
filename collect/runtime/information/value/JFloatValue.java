@@ -18,8 +18,8 @@ public class JFloatValue extends JValue {
         this.floatv = value;
         this.real = value.floatValue();
         this.fieldPath = jvalue.fieldPath.clone();
-        
         this.topLevelObjId = jvalue.topLevelObjId;
+        this.realAsString = String.valueOf(real);
     }
 
     public JFloatValue(float real, boolean isWrapper) {
@@ -27,6 +27,7 @@ public class JFloatValue extends JValue {
         this.floatv = null;
         this.real = real;
         this.isWrapper = isWrapper;
+        this.realAsString = String.valueOf(real);
     }
 
     public float getRealValue() {
@@ -61,9 +62,5 @@ public class JFloatValue extends JValue {
     @Override
     public Value getVmValue() {
         return this.floatv;
-    }
-    @Override
-    public String getRealValueAsString(){
-        return String.valueOf(real);
     }
 }

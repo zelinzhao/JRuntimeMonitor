@@ -20,8 +20,8 @@ public class JIntegerValue extends JValue {
         this.integer = value;
         this.real = value.intValue();
         this.fieldPath = jvalue.fieldPath.clone();
-        
         this.topLevelObjId = jvalue.topLevelObjId;
+        this.realAsString = String.valueOf(real);
     }
 
     public JIntegerValue(int real, boolean isWrapper) {
@@ -29,6 +29,7 @@ public class JIntegerValue extends JValue {
         this.integer = null;
         this.real = real;
         this.isWrapper = isWrapper;
+        this.realAsString = String.valueOf(real);
     }
 
     public int getRealValue() {
@@ -64,9 +65,5 @@ public class JIntegerValue extends JValue {
     @Override
     public Value getVmValue() {
         return this.integer;
-    }
-    @Override
-    public String getRealValueAsString(){
-        return String.valueOf(real);
     }
 }

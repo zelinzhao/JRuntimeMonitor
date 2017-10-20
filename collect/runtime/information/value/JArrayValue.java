@@ -39,8 +39,8 @@ public class JArrayValue extends JValue {
         this.array = array;
         this.alreadyObj = jvalue.alreadyObj;
         this.fieldPath = jvalue.fieldPath.clone();
-        
         this.topLevelObjId = jvalue.topLevelObjId;
+        this.realAsString = JValue.NOT_NULL;
     }
 
     public Type getElementType() {
@@ -104,9 +104,5 @@ public class JArrayValue extends JValue {
     @Override
     public Value getVmValue() {
         return this.array;
-    }
-    @Override
-    public String getRealValueAsString(){
-        return NOT_NULL;
     }
 }

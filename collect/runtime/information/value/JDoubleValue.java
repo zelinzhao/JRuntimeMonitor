@@ -18,8 +18,8 @@ public class JDoubleValue extends JValue {
         this.doublev = value;
         this.real = value.doubleValue();
         this.fieldPath = jvalue.fieldPath.clone();
-        
         this.topLevelObjId = jvalue.topLevelObjId;
+        this.realAsString = String.valueOf(real);
     }
 
     public JDoubleValue(double real, boolean isWrapper) {
@@ -27,6 +27,7 @@ public class JDoubleValue extends JValue {
         this.doublev = null;
         this.real = real;
         this.isWrapper = isWrapper;
+        this.realAsString = String.valueOf(real);
     }
 
     public double getRealValue() {
@@ -61,9 +62,5 @@ public class JDoubleValue extends JValue {
     @Override
     public Value getVmValue() {
         return this.doublev;
-    }
-    @Override
-    public String getRealValueAsString(){
-        return String.valueOf(real);
     }
 }
