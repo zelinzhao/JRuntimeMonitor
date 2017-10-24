@@ -1,18 +1,11 @@
 package collect.runtime.information.hierarchy;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
-
 import com.sun.jdi.ClassNotLoadedException;
 import com.sun.jdi.Field;
 import com.sun.jdi.ObjectReference;
 import com.sun.jdi.ReferenceType;
 import com.sun.jdi.ThreadReference;
-import com.sun.jdi.Type;
-
-import collect.runtime.information.condition.Condition;
-import collect.runtime.information.main.VMInfo;
 import collect.runtime.information.value.JObjectValue;
 
 public class JClass extends Base {

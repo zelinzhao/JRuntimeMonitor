@@ -186,7 +186,6 @@ public class VMConnection extends VM {
             }
         } else if (event instanceof BreakpointEvent) {
             this.info.clearInfo();
-            
             BreakpointEvent breakevent = (BreakpointEvent) event;
             ProgramPoint pp = this.cmds.getStopCmdsByEvent(breakevent);
             if(pp==null){
@@ -202,7 +201,15 @@ public class VMConnection extends VM {
                 e.printStackTrace();
             }
             
-            //print all targeted objects here
+            pp.incrementTimes();
+            if(pp.needReset()){
+                int next=pp.nextTimes();
+                if(next<0)
+                    breakevent.request().disable();
+                else
+                    createBreakPointRequest(breakevent.location(),next);
+            }
+                
         } else if ((event instanceof VMDisconnectEvent) || (event instanceof VMDeathEvent)) {
             this.connected = false;
             this.output.connected = false;
@@ -219,7 +226,7 @@ public class VMConnection extends VM {
             } else if (cmd.isLinePoint()) {
                 List<Location> location = classref.locationsOfLine(cmd.getLineNo());
                 if(location!=null && location.size()>0)
-                    createBreakPointRequest(location.get(0));
+                    createBreakPointRequest(location.get(0), cmd.initialTimes());
             } else {
                 //here, jdi can only stop at a class's methods entry/exit (all method)
                 //jdi cannot stop at some specific method's entry/exit.
@@ -233,10 +240,10 @@ public class VMConnection extends VM {
                 } else {
                     List<Location> locations = method.allLineLocations();
                     if (cmd.isMethodEnter()) {
-                        createBreakPointRequest(locations.get(0));
+                        createBreakPointRequest(locations.get(0), cmd.initialTimes());
                         cmd.setLineNo(locations.get(0).lineNumber());
                     } else if (cmd.isMethodExit() && locations.size()>1) {
-                        createBreakPointRequest(locations.get(locations.size() - 1));
+                        createBreakPointRequest(locations.get(locations.size() - 1), cmd.initialTimes());
                         cmd.setLineNo(locations.get(locations.size()-1).lineNumber());
                     }
                 }
@@ -264,8 +271,10 @@ public class VMConnection extends VM {
         classPrepareRequest.enable();
     }
 
-    private void createBreakPointRequest(Location location) {
+    private void createBreakPointRequest(Location location, int counterFilter) {
         BreakpointRequest breakrequest = this.eventRequestManager.createBreakpointRequest(location);
+        if(counterFilter != 0)
+            breakrequest.addCountFilter(counterFilter);
         breakrequest.setSuspendPolicy(EventRequest.SUSPEND_EVENT_THREAD);
         breakrequest.enable();
     }

@@ -1,9 +1,6 @@
 package collect.runtime.information.hierarchy;
 
-import java.util.List;
-
 import com.sun.jdi.Method;
-import com.sun.jdi.Type;
 
 public class JMethod extends Base {
     private Method method;

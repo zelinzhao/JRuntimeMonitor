@@ -1,12 +1,33 @@
 package collect.runtime.information.main;
 
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.atomic.AtomicInteger;
+
 enum PointLoc {
     ENTER, EXIT, LINE, OTHER;
 }
+enum TimesType{
+    BEFORE,
+    AFTER,
+    AT;
+    
+    /**Used for BEFORE or AFTER. Default is 0.*/
+    int times = 0;
+    /**Used for AT. Use concurrent queue.*/
+    ConcurrentLinkedQueue<Integer> timesQueue ;
+}
+
 
 public class ProgramPoint {
     private String fullClassName;
     private PointLoc loc = PointLoc.OTHER;
+    
+    private TimesType timeType = TimesType.AFTER;
+    
+    private AtomicInteger nowTimes = new AtomicInteger(0);
+    /** only for AT points*/
+    private AtomicInteger preTimes = new AtomicInteger(0);
+    
 
     /**
      * for method entry/exit point, used with {@link methodDesc}. {@link loc}
@@ -34,21 +55,102 @@ public class ProgramPoint {
             this.fullClassName = point.substring(0, point.indexOf('-'));
             this.methodName = point.substring(point.indexOf('-') + 1, point.lastIndexOf('-'));
             this.methodDesc = point.substring(point.lastIndexOf('-') + 1, point.indexOf(':'));
-            if (point.substring(point.indexOf(':') + 1).equals("enter"))
+            if (point.substring( point.indexOf(':') + 1, point.indexOf('@') ).equals("enter"))
                 this.loc = PointLoc.ENTER;
-            else if (point.substring(point.indexOf(':') + 1).equals("exit"))
+            else if (point.substring( point.indexOf(':') + 1, point.indexOf('@') ).equals("exit") )
                 this.loc = PointLoc.EXIT;
             else
                 System.out.println(point + " may be a wrong point");
         } else {
             this.fullClassName = point.substring(0, point.indexOf(':'));
-            this.lineNo = Integer.valueOf(point.substring(point.indexOf(':') + 1));
+            this.lineNo = Integer.valueOf(point.substring(point.indexOf(':') + 1, point.indexOf('@')));
             this.loc = PointLoc.LINE;
         }
+        String times = point.substring( point.indexOf('@')+1 );
+        String[] sp = times.split("@");
+        switch(sp[0]){
+            case "AT":{
+                this.timeType = TimesType.AT;
+                this.timeType.timesQueue = new ConcurrentLinkedQueue<Integer>();
+                for(int i=1; i<sp.length; i++)
+                    this.timeType.timesQueue.add(Integer.valueOf(sp[i]));
+                this.nowTimes.set(this.timeType.timesQueue.poll());
+                break;
+            }
+            case "BEFORE":{
+                this.timeType = TimesType.BEFORE;
+                this.timeType.times = Integer.valueOf(sp[1]);
+                if(this.timeType.times<=1)
+                    System.exit(-1);
+                this.nowTimes.set(1);
+                break;
+            }
+            case "AFTER":{
+                this.timeType = TimesType.AFTER;
+                this.timeType.times = Integer.valueOf(sp[1]);
+                if(this.timeType.times<=0)
+                    System.exit(-1);
+                this.nowTimes.set(this.timeType.times);
+                break;
+            }
+            default:{break;}
+        }
+    }
+    
+    public void incrementTimes(){
+        if(this.timeType == TimesType.BEFORE || this.timeType == TimesType.AFTER)
+            this.nowTimes.incrementAndGet();
+        if(this.timeType == TimesType.AT)
+            if(this.timeType.timesQueue.isEmpty())
+                return;
+            else{
+                this.preTimes.set(this.nowTimes.get());
+                this.nowTimes.set(this.timeType.timesQueue.peek());
+            }
+    }
+    
+    public int initialTimes(){
+        if(this.timeType == TimesType.BEFORE && this.nowTimes.get() == 1)
+            return 0;
+        return this.nowTimes.get();
     }
 
-    // public void setFullClassName(String
-    // className){this.fullClassName=className;}
+    public boolean needReset(){
+        if(this.timeType == TimesType.BEFORE)
+            if(this.nowTimes.get()< this.timeType.times )
+                return false;
+            else
+                return true;
+        if(this.timeType == TimesType.AFTER)
+            if(this.nowTimes.get() == this.timeType.times+1)
+                return true;
+            else
+                return false;
+        if(this.timeType == TimesType.AT)
+            if(this.timeType.timesQueue.isEmpty())
+                return false;
+            else
+                return true;
+        return true;
+    }
+    
+    /**
+     * 
+     * @return positive numbers, next stop times; 0, reset to forever stop; negative, disable this point
+     */
+    public int nextTimes(){
+        if(this.timeType == TimesType.BEFORE && this.nowTimes.get() >= this.timeType.times )
+            return -1;
+        else if(this.timeType == TimesType.AFTER && this.nowTimes.get() == this.timeType.times+1)
+            return 0;
+        else if(this.timeType == TimesType.AT)
+            if(this.timeType.timesQueue.isEmpty())
+                return -1;
+            else
+                return (this.timeType.timesQueue.poll()-this.preTimes.get());
+        return -1;
+    }
+    
     public String getFullClassName() {
         return this.fullClassName;
     }
@@ -100,14 +202,13 @@ public class ProgramPoint {
     @Override
     public String toString() {
         if (this.loc == PointLoc.ENTER)
-            return "@@,"+this.fullClassName + "-" + this.methodName + "-" + this.methodDesc + ":enter";
+            return "@@,"+this.fullClassName + "-" + this.methodName + "-" + this.methodDesc + ":enter"+"@AT@"+this.nowTimes.get();
         else if (this.loc == PointLoc.EXIT)
-            return "@@,"+this.fullClassName + "-" + this.methodName + "-" + this.methodDesc + ":exit";
+            return "@@,"+this.fullClassName + "-" + this.methodName + "-" + this.methodDesc + ":exit"+"@AT@"+this.nowTimes.get();
         else if (this.loc == PointLoc.LINE)
-            return "@@,"+this.fullClassName + ":" + this.lineNo;
+            return "@@,"+this.fullClassName + ":" + this.lineNo+"@AT@"+this.nowTimes.get();
         else
             return null;
-
     }
 
     /**

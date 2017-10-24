@@ -1,9 +1,5 @@
 package collect.runtime.information.main;
 
-import java.io.File;
-import java.util.HashSet;
-import java.util.StringTokenizer;
-
 public class VMArgs{
     private String classpath = "";
     private String mainClass = "";
