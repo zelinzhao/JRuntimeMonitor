@@ -108,4 +108,18 @@ public abstract class Condition {
             return false;
         return true;
     }
+    
+    /**
+     * Exclude {@code cond} from {@code this} condition
+     * @param cond excluded cond
+     * @return new condition that excludes {@code cond}
+     */
+//    public abstract Condition exclude(Condition cond);
+    
+    /**
+     * Include {@code cond} to {@code this} condition
+     * @param cond included cond
+     * @return new condition that includes {@code cond}
+     */
+//    public abstract Condition include(Condition cond);
 }

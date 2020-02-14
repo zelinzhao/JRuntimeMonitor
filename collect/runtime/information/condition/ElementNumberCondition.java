@@ -72,6 +72,7 @@ public class ElementNumberCondition extends Condition{
         //the JValue.equals method also compares the real value.
         return this.jvalue.getFieldPath().equals(enc.jvalue.getFieldPath());
     }
+    
     @Override
     public int hashCode(){
         return this.oper.hashCode()+this.jvalue.getFieldPath().hashCode()+this.number;

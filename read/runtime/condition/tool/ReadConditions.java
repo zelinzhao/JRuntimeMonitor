@@ -6,6 +6,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
 import collect.runtime.information.condition.Condition;
@@ -17,29 +18,29 @@ import collect.runtime.information.main.ProgramPoint;
 
 public class ReadConditions {
 
-    public static HashMap<ProgramPoint, List<Condition>> readConditions(String inputFile) throws IOException {
+    public static HashMap<ProgramPoint, HashSet<Condition>> readConditions(String inputFile) throws IOException {
         BufferedReader reader = new BufferedReader(new FileReader(inputFile));
-        HashMap<ProgramPoint, List<Condition>> pointConditions = new HashMap<ProgramPoint, List<Condition>>();
+        HashMap<ProgramPoint, HashSet<Condition>> pointConditions = new HashMap<ProgramPoint, HashSet<Condition>>();
         
         ProgramPoint currentPoint =null;
-        List<Condition> currentConditions = new ArrayList<Condition>();
+        HashSet<Condition> currentConditions = new HashSet<Condition>();
         
         String temp = reader.readLine();
         while (temp != null) {
-            System.out.println("read: "+temp);
             //clear all whitespace
             String[] sp = temp.replaceAll("\\s", "").split(",");
             // sp[0] defines a stop point or a condition
             switch (sp[0]) {
                 case "@@":{ // it is a stop point
                     ProgramPoint pp = new ProgramPoint(sp[1]);
-                    System.out.println("get:  "+ pp.toString());
                     //put previous point and conditions in the map
-                    if(currentPoint!=null)
+                    if(currentPoint!=null && !currentConditions.isEmpty())
                         pointConditions.put(currentPoint, currentConditions);
                     //re-initialized point and conditions for this new point
                     currentPoint = pp;
-                    currentConditions.clear();
+                    currentConditions = pointConditions.get(currentPoint);
+                    if(currentConditions == null)
+                        currentConditions = new HashSet<Condition>();
                     break;
                 }
                 default:{ // it is a condition
@@ -75,6 +76,9 @@ public class ReadConditions {
             temp = reader.readLine();
         }
         reader.close();
+
+        if(!currentConditions.isEmpty())
+            pointConditions.put(currentPoint, currentConditions);
         return pointConditions;
     }
 //    public static void main(String[] args){
@@ -87,5 +91,4 @@ public class ReadConditions {
 //            e.printStackTrace();
 //        }
 //    }
-
 }

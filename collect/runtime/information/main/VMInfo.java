@@ -49,8 +49,6 @@ public class VMInfo {
     // static fields
     /** for output conditions at stop points */
     public static Set<Condition> outputConditions = new HashSet<Condition>();
-    /** for input conditions. point id and conditions */
-    public static HashMap<String, List<Condition>> inputConditions = new HashMap<String, List<Condition>>();
     /** default is 1 */
     public static Level LEVEL = Level.ONE;
     /** default is 1. 0 is no limit. */
@@ -61,7 +59,7 @@ public class VMInfo {
     private BufferedWriter writer;
     /** reading stop points and corresponding conditions from this file */
     private String inputFile;
-    private HashMap<ProgramPoint, List<Condition>> pointConditions; 
+    private HashMap<ProgramPoint, HashSet<Condition>> pointConditions; 
 
     public void setOutputFile(String outputFile) {
         this.outputFile = outputFile;
